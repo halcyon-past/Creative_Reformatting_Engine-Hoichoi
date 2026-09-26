@@ -1,0 +1,14 @@
+project     = "hoichoi-cre"
+environment = "dev"
+region      = "ap-south-1"
+
+# Build and push first:
+#   aws ecr create-repository --repository-name hoichoi-cre
+#   docker build -f backend/Dockerfile -t <acct>.dkr.ecr.<region>.amazonaws.com/hoichoi-cre:v1 .
+#   docker push <acct>.dkr.ecr.<region>.amazonaws.com/hoichoi-cre:v1
+image = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/hoichoi-cre:v1"
+
+allowed_origins = ["https://cre.example.com"]
+
+worker_min_count = 1
+worker_max_count = 10

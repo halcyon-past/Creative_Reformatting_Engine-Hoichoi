@@ -1,0 +1,28 @@
+# data & generated media
+data/
+!data/.gitkeep
+test_sample/*
+!test_sample/.gitkeep
+
+# python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# node
+node_modules/
+frontend/dist/
+
+# env & editors
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+.vscode/

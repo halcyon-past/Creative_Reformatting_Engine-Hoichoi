@@ -1,0 +1,33 @@
+# Local stack. The API runs the in-process worker by default; a dedicated
+# worker service is included to mirror the AWS topology, where the API and the
+# renderers scale independently.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      CRE_ENV: docker
+      CRE_DEBUG: "false"
+      CRE_STORAGE_BACKEND: local
+      CRE_QUEUE_BACKEND: inmemory
+      CRE_REPOSITORY_BACKEND: sqlite
+      CRE_DATA_DIR: /data
+      CRE_CORS_ORIGINS: "http://localhost:5173,http://localhost:8080"
+      CRE_WORKER_CONCURRENCY: "2"
+    volumes:
+      - cre-data:/data
+    ports:
+      - "8000:8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+volumes:
+  cre-data:

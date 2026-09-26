@@ -1,0 +1,189 @@
+# =============================================================================
+# Creative Reformatting Engine - Platform Spec Sheet
+# =============================================================================
+# Machine-readable delivery contract. Every derived asset is validated against
+# the profile it was rendered for BEFORE it is allowed into the library.
+#
+# Coordinates in `safe_zones` and `reserved_zones` are normalised frame
+# fractions (0..1), origin top-left.
+#   - safe_zones.action  : subject must stay inside this region
+#   - safe_zones.title   : text/graphics must stay inside this region
+#   - reserved_zones     : platform UI chrome overlays this region; no face or
+#                          primary subject may fall inside it
+# =============================================================================
+spec_id: hoichoi_social_delivery
+spec_version: "1.3.0"
+updated: "2026-09-20"
+description: >
+  Hoichoi OTT social + on-platform delivery spec. Covers the four mandated
+  aspect ratios for stills plus the vertical reel cutdown.
+
+defaults:
+  image:
+    formats: [jpg]
+    color_space: srgb
+    max_file_size_mb: 8
+    min_sharpness: 45.0          # variance-of-Laplacian floor
+    jpeg_quality: 92
+    max_letterbox_fraction: 0.01 # no black bars
+    luma_mean_range: [22, 238]
+  video:
+    container: mp4
+    video_codec: h264
+    pixel_format: yuv420p
+    audio_codec: aac
+    audio_channels: 2
+    audio_sample_rate: 48000
+    max_file_size_mb: 120
+    max_letterbox_fraction: 0.01
+    # Deliberately far below the stills figure. A 9:16 reel carries only ~607px
+    # of real horizontal detail from a 1920x1080 master and is then upscaled to
+    # 1080 wide, which costs most of the measured Laplacian variance: normal
+    # output lands at 12-20 where the HD source reads ~70. A genuinely
+    # defocused frame still measures below 2, so this floor catches real
+    # softness without failing every correctly-derived vertical cut.
+    min_sharpness: 6.0
+  compliance:
+    # Subject-integrity rules applied to the *rendered output*, re-detected
+    # independently of the crop decision. This is what stops a bolted-on
+    # face detector from passing.
+    face_clip_tolerance: 0.995   # a face must be >=99.5% inside the frame
+    min_face_edge_margin: 0.008  # and >=0.8% of the frame away from any edge
+    require_subject_present: true
+    # A detected face counts as a *subject* when it is either this fraction of
+    # the largest face in the frame, or this fraction of the frame height.
+    # Clipping a subject is a failure. Anything smaller is an incidental
+    # background extra: in a wide crowd shot reframed to 9:16 some of those are
+    # unavoidably cut, and failing the asset for it would be wrong -- so they
+    # are reported as warnings with evidence instead.
+    significant_face_relative_size: 0.45
+    significant_face_frame_fraction: 0.055
+    # video only.
+    # Coverage is measured by frontal-face detection on sampled frames, which
+    # under-counts: a subject turning to profile in a dialogue close-up is
+    # still in frame but stops being detectable. So the headline threshold is
+    # deliberately loose, and the rule that actually bites is the absence gap
+    # below -- losing the subject for a moment is nothing, losing them for two
+    # seconds means the crop is following the wrong thing.
+    min_subject_frame_coverage: 0.70
+    max_subject_absence_s: 1.5
+    min_active_speaker_coverage: 0.80  # speaker framed in >=80% of speech time
+    max_static_frames_fraction: 0.95   # reject a crop path that never moves
+
+profiles:
+  # ---------------------------------------------------------------- 16:9 ----
+  - id: hero_landscape_16x9
+    label: Hero Landscape
+    ratio: "16:9"
+    kind: image
+    width: 1920
+    height: 1080
+    safe_zones:
+      action: [0.04, 0.04, 0.96, 0.96]
+      title:  [0.08, 0.08, 0.92, 0.92]
+    reserved_zones: []
+    composition:
+      rule: thirds
+      prefer_headroom: true
+      min_face_height_fraction: 0.06
+
+  # ----------------------------------------------------------------- 1:1 ----
+  - id: social_square_1x1
+    label: Social Square
+    ratio: "1:1"
+    kind: image
+    width: 1080
+    height: 1080
+    safe_zones:
+      action: [0.05, 0.05, 0.95, 0.95]
+      title:  [0.10, 0.10, 0.90, 0.90]
+    reserved_zones: []
+    composition:
+      rule: thirds
+      prefer_headroom: true
+      min_face_height_fraction: 0.08
+
+  # ---------------------------------------------------------------- 9:16 ----
+  - id: story_vertical_9x16
+    label: Story / Vertical
+    ratio: "9:16"
+    kind: image
+    width: 1080
+    height: 1920
+    safe_zones:
+      action: [0.05, 0.14, 0.95, 0.84]
+      title:  [0.08, 0.18, 0.92, 0.80]
+    reserved_zones:
+      # IG/TikTok top status + bottom caption & action rail
+      - { name: top_chrome,    rect: [0.00, 0.00, 1.00, 0.12] }
+      - { name: bottom_chrome, rect: [0.00, 0.86, 1.00, 1.00] }
+      - { name: action_rail,   rect: [0.82, 0.55, 1.00, 0.86] }
+    composition:
+      rule: thirds
+      prefer_headroom: true
+      min_face_height_fraction: 0.09
+
+  # ----------------------------------------------------------------- 4:5 ----
+  - id: feed_portrait_4x5
+    label: Feed Portrait
+    ratio: "4:5"
+    kind: image
+    width: 1080
+    height: 1350
+    safe_zones:
+      action: [0.05, 0.06, 0.95, 0.94]
+      title:  [0.09, 0.10, 0.91, 0.90]
+    reserved_zones: []
+    composition:
+      rule: thirds
+      prefer_headroom: true
+      min_face_height_fraction: 0.08
+
+  # ------------------------------------------------- 9:16 speaker reel ------
+  - id: reel_vertical_9x16
+    label: Vertical Reel (speaker-aware)
+    ratio: "9:16"
+    kind: video
+    width: 1080
+    height: 1920
+    fps_range: [23.0, 61.0]
+    duration_range_s: [3.0, 90.0]
+    bitrate_kbps_range: [1500, 14000]
+    safe_zones:
+      action: [0.05, 0.14, 0.95, 0.84]
+      title:  [0.08, 0.18, 0.92, 0.80]
+    reserved_zones:
+      - { name: top_chrome,    rect: [0.00, 0.00, 1.00, 0.12] }
+      - { name: bottom_chrome, rect: [0.00, 0.86, 1.00, 1.00] }
+      - { name: action_rail,   rect: [0.82, 0.55, 1.00, 0.86] }
+    composition:
+      rule: thirds
+      prefer_headroom: true
+      min_face_height_fraction: 0.10
+    overrides:
+      # subject-coverage and absence limits are inherited from defaults
+      min_active_speaker_coverage: 0.80
+
+  # ---------------------------------------- still pulled from the video -----
+  - id: video_still_16x9
+    label: Key Still (from video)
+    ratio: "16:9"
+    kind: image
+    width: 1920
+    height: 1080
+    source: video_still
+    safe_zones:
+      action: [0.04, 0.04, 0.96, 0.96]
+      title:  [0.08, 0.08, 0.92, 0.92]
+    reserved_zones: []
+    composition:
+      rule: thirds
+      prefer_headroom: true
+      min_face_height_fraction: 0.05
+    overrides:
+      min_sharpness: 60.0   # a still pulled from video must not be a blurry frame
+
+# Which profiles make up the default render set for each source kind.
+render_sets:
+  image: [hero_landscape_16x9, social_square_1x1, story_vertical_9x16, feed_portrait_4x5]
+  video: [reel_vertical_9x16, video_still_16x9]
