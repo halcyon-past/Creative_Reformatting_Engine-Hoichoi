@@ -6,9 +6,7 @@ diagnostics/
 !data/.gitkeep
 test_sample/*
 !test_sample/.gitkeep
-demo_video/*.mp4
-demo_video/*.wav
-demo_video/*.aiff
+demo_video/
 
 # python
 .venv/
