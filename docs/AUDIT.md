@@ -1,5 +1,11 @@
 # Audit trail
 
+*What gets recorded, how the caller's address is derived safely, and how long it is kept.*
+
+<sub>[← Back to the README](../README.md) &middot; [Architecture](ARCHITECTURE.md) &middot; [Audit](AUDIT.md) &middot; [AWS migration](AWS_MIGRATION.md) &middot; [Free tier](FREE_TIER.md)</sub>
+
+---
+
 Every state change worth reconstructing is appended to an **append-only**
 `audit_events` table. Nothing in the system updates or deletes an audit row
 except the retention purge.
@@ -110,3 +116,13 @@ consistent with the rest of the schema. Indexes exist on `at`, `action`,
 
 On AWS the same table lives in Aurora (scalable stack) or SQLite on EBS
 (free-tier stack); the repository port is unchanged either way.
+
+---
+
+<div align="center">
+
+**Creative Reformatting Engine** — built by [Aritro Saha](https://openworld.aritro.cloud)
+
+[openworld.aritro.cloud](https://openworld.aritro.cloud)
+
+</div>

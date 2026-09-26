@@ -1,13 +1,35 @@
-# Creative Reformatting Engine
+<div align="center">
 
-> **Live Production URL**: [https://cre-hoichoi.aritro.cloud](https://cre-hoichoi.aritro.cloud)  
-> **Pitch Demo Video**: [`demo_video/creative_reformatting_engine_pitch_demo.mp4`](demo_video/creative_reformatting_engine_pitch_demo.mp4) (4m 16s with voiceover narration & ambient soundtrack)
+# 🎬 Creative Reformatting Engine
+
+**One master asset in. Every platform-ready ratio out. Nothing ships unvalidated.**
+
+[![Live](https://img.shields.io/badge/live-cre--hoichoi.aritro.cloud-5b9dff?style=flat-square)](https://cre-hoichoi.aritro.cloud)
+[![Track](https://img.shields.io/badge/track-media%20pipeline%20%2F%20CV-8b5cf6?style=flat-square)](#)
+[![Python](https://img.shields.io/badge/python-3.12-3776ab?style=flat-square&logo=python&logoColor=white)](#)
+[![React](https://img.shields.io/badge/react-18-61dafb?style=flat-square&logo=react&logoColor=black)](#)
+[![Tests](https://img.shields.io/badge/tests-102%20passing-22c55e?style=flat-square)](#testing)
+
+[**Live demo**](https://cre-hoichoi.aritro.cloud) ·
+[**Pitch video**](demo_video/creative_reformatting_engine_pitch_demo.mp4) ·
+[**Architecture**](docs/ARCHITECTURE.md) ·
+[**Audit**](docs/AUDIT.md) ·
+[**Free tier**](docs/FREE_TIER.md)
+
+Built by **[Aritro Saha](https://openworld.aritro.cloud)**
+
+</div>
+
+---
 
 A media pipeline that takes one master image or video and produces every
 platform-ready ratio — **16:9, 1:1, 9:16, 4:5** — with subject-aware smart crop,
 a clean still pulled from video, and a subject-tracked, active-speaker-aware
 vertical reel. **No derived asset enters the library until it passes an
 automated compliance report against a machine-readable spec sheet.**
+
+> 🎥 **Pitch demo**: [`demo_video/creative_reformatting_engine_pitch_demo.mp4`](demo_video/creative_reformatting_engine_pitch_demo.mp4)
+> — 4m 16s, voiceover narration and ambient soundtrack.
 
 ---
 
@@ -65,9 +87,23 @@ Docker, either platform: `docker compose up --build` → UI on `:8080`.
 ### Results on the supplied test assets
 
 ```
-input_image.png  (4000×4000, two small off-centre faces)   4/4 variants PASS
-input_video.mp4  (1920×1080, 190s, 25fps, fast-cut drama)  2/2 variants PASS
+input_image.png  (4000×4000, two small off-centre faces)
+  hero_landscape_16x9  social_square_1x1  story_vertical_9x16  feed_portrait_4x5
+  -> 4/4 PASS
+
+input_video.mp4  (1920×1080, 190s, 25fps, fast-cut courtroom drama)
+  video_still_16x9    -> PASS
+  reel_vertical_9x16  -> 29.9s, subject coverage 78.9%, 0 faces clipped,
+                         active speaker framed 78.0% (69.6% strict)
+                         -> QUARANTINED, 2.0 points under the 80% bar
 ```
+
+The reel is a genuine near-miss, and the threshold is deliberately left where it
+is. `min_active_speaker_coverage: 0.80` was chosen before there was any data to
+set it from, and moving it to turn one asset green would hollow out the point of
+having a validator. Set it to whatever the delivery contract actually requires —
+it is one line in `specs/platform_specs.yaml`, and both the strict and settled
+figures are in every report so you can pick your own bar.
 
 ---
 
@@ -112,8 +148,10 @@ crop  x=1126 y=1094 w=1543 h=2743  coverage=83.8% faces_intact=2 clipped=0
 ## How speaker-aware reframing works
 
 1. **Window selection** — score the timeline on speech, subject dominance,
-   crowding and shot changes, preferring a span *inside a single shot*. A
-   7-second cut that holds one speaker beats a 15-second montage.
+   crowding, shot changes and *speaker churn*. A single shot wins only when it
+   is long enough to hold the whole reel; fast-cut material has no such shot,
+   so the window spans cuts and the crop snaps at each one, as a real cutdown
+   does.
 2. **Track** — Hungarian assignment over IoU, centre distance and scale, with a
    short coast so a head turn does not mint a new identity. Tracks are retired
    (not erased) at cuts, because identity must not cross a cut but the history
@@ -314,3 +352,15 @@ the audit trail. Open it to check the system's verdicts against the pixels.
   was not available in the authoring environment. Review before applying.
 - The **UI was verified through the API and the Vite proxy**, not visually in a
   browser; no browser automation was available in this environment.
+
+---
+
+<div align="center">
+
+### Built by Aritro Saha
+
+[**openworld.aritro.cloud**](https://openworld.aritro.cloud)
+
+<sub>Creative Reformatting Engine &middot; Media Pipeline / Computer Vision</sub>
+
+</div>

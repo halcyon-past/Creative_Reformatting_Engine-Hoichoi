@@ -1,5 +1,11 @@
 # Architecture
 
+*How the system is put together, and why each decision went the way it did.*
+
+<sub>[← Back to the README](../README.md) &middot; [Architecture](ARCHITECTURE.md) &middot; [Audit](AUDIT.md) &middot; [AWS migration](AWS_MIGRATION.md) &middot; [Free tier](FREE_TIER.md)</sub>
+
+---
+
 ## Why ports and adapters
 
 The brief asks for something that runs locally now and moves to AWS later. The
@@ -76,8 +82,19 @@ Stepped with Euler it is only stable while `omega*dt` stays well under 1;
 analysis runs as low as 6 fps, which pushes `omega*dt` to about 2.7 on the
 faster switch frequency. The filter rang instead of settling and the crop
 strobed 400px between two subjects on alternate frames. Integrating the exact
-solution removes the dependence on `dt` entirely — speaker framing went from
-53% to 83% on the sample video from this change alone.
+solution removes the dependence on `dt` entirely. Measured on the same 15 s
+window before and after, speaker framing went from 53% to 83% on this change
+alone; the shipped 30 s reel sits at 78%, over a window containing 12 shot cuts
+and 13 speaker changes.
+
+**Clipping is judged on the facial core, not the padded head.** The head box
+pads outward to include hair, and on a close-up it routinely runs off the top of
+the *source* frame — so no crop could contain it, every subject-centred
+candidate took the full clipping penalty, and excluding the subject entirely
+became the cheaper option. The solver was correctly optimising a penalty defined
+wrongly. Judging the core, clamped to the frame, also makes the solver agree
+with the validator, which already scored the core: the two halves had been
+disagreeing about what "clipped" meant.
 
 **Adaptive shot detection.** Within-shot histogram correlation depends entirely
 on content: a locked-off dialogue scene sits at 0.99, handheld action much
@@ -114,3 +131,13 @@ flight is expensive to lose.
 The SQS visibility timeout must exceed the slowest job, or SQS redelivers work
 still in progress and the same asset renders twice. It is set to 15 minutes
 against a worst case of a few minutes.
+
+---
+
+<div align="center">
+
+**Creative Reformatting Engine** — built by [Aritro Saha](https://openworld.aritro.cloud)
+
+[openworld.aritro.cloud](https://openworld.aritro.cloud)
+
+</div>

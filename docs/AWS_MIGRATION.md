@@ -1,5 +1,11 @@
 # Migrating to AWS
 
+*Moving from a laptop to the scalable AWS topology.*
+
+<sub>[← Back to the README](../README.md) &middot; [Architecture](ARCHITECTURE.md) &middot; [Audit](AUDIT.md) &middot; [AWS migration](AWS_MIGRATION.md) &middot; [Free tier](FREE_TIER.md)</sub>
+
+---
+
 The application code does not change. Three environment variables switch the
 backends, and the container image is the same one that runs locally.
 
@@ -94,3 +100,13 @@ uploads does not make the UI unresponsive.
 - **Per-AZ NAT gateways.** One is sufficient until this is multi-AZ critical,
   and S3 traffic — the bulk of the data movement — already bypasses it via the
   gateway endpoint.
+
+---
+
+<div align="center">
+
+**Creative Reformatting Engine** — built by [Aritro Saha](https://openworld.aritro.cloud)
+
+[openworld.aritro.cloud](https://openworld.aritro.cloud)
+
+</div>

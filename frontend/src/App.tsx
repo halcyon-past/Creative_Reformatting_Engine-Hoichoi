@@ -74,7 +74,7 @@ export default function App() {
       <footer className="border-t border-ink-600/60 bg-ink-900/80 py-4 text-center text-xs text-slate-400">
         Made by{" "}
         <a
-          href="https://aritro.cloud"
+          href="https://openworld.aritro.cloud"
           target="_blank"
           rel="noopener noreferrer"
           className="font-medium text-accent hover:underline underline-offset-4 transition-colors"
