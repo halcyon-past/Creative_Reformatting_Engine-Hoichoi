@@ -8,7 +8,15 @@ from pathlib import Path
 from typing import BinaryIO
 
 from cre.config import Settings
-from cre.domain.enums import AssetStatus, JobStatus, JobType, MediaKind, VariantStatus
+from cre.domain.enums import (
+    AssetStatus,
+    AuditAction,
+    AuditOutcome,
+    JobStatus,
+    JobType,
+    MediaKind,
+    VariantStatus,
+)
 from cre.domain.models import Asset, Job, Variant
 from cre.errors import NotFoundError, UnsupportedMediaError
 from cre.logging_config import get_logger
@@ -16,6 +24,7 @@ from cre.media import ffmpeg
 from cre.ports.queue import JobQueue
 from cre.ports.repository import Repository
 from cre.ports.storage import Storage
+from cre.services.audit_service import AuditService
 
 log = get_logger(__name__)
 
@@ -27,17 +36,23 @@ class AssetService:
         storage: Storage,
         repo: Repository,
         queue: JobQueue,
+        audit: AuditService | None = None,
     ) -> None:
         self.settings = settings
         self.storage = storage
         self.repo = repo
         self.queue = queue
+        self.audit = audit
 
     # ------------------------------------------------------------------ #
     # ingest
     # ------------------------------------------------------------------ #
     async def ingest_stream(
-        self, stream: BinaryIO, filename: str, title: str | None = None
+        self,
+        stream: BinaryIO,
+        filename: str,
+        title: str | None = None,
+        actor: dict | None = None,
     ) -> Asset:
         """Store an uploaded file and register it as a master asset."""
         suffix = Path(filename).suffix.lower()
@@ -58,9 +73,11 @@ class AssetService:
             shutil.copyfileobj(stream, fh, length=4 * 1024 * 1024)
         self.storage.commit_local(key)
 
-        return await self._register(asset, dest)
+        return await self._register(asset, dest, actor)
 
-    async def ingest_path(self, path: Path, title: str | None = None) -> Asset:
+    async def ingest_path(
+        self, path: Path, title: str | None = None, actor: dict | None = None
+    ) -> Asset:
         """Register a file already on disk. Used by the CLI and the tests."""
         path = Path(path)
         if not path.exists():
@@ -80,15 +97,25 @@ class AssetService:
             shutil.copy2(path, dest)
         self.storage.commit_local(key)
 
-        return await self._register(asset, dest)
+        return await self._register(asset, dest, actor)
 
-    async def _register(self, asset: Asset, path: Path) -> Asset:
+    async def _register(
+        self, asset: Asset, path: Path, actor: dict | None = None
+    ) -> Asset:
         try:
             asset.media = ffmpeg.probe_media(path)
         except Exception as exc:
             asset.status = AssetStatus.FAILED
             asset.error = f"could not probe media: {exc}"
             await self.repo.save_asset(asset)
+            if self.audit:
+                await self.audit.record(
+                    AuditAction.ASSET_UPLOADED,
+                    outcome=AuditOutcome.FAILURE,
+                    actor=actor, asset_id=asset.id,
+                    message=f"rejected: {exc}",
+                    detail={"filename": asset.original_filename},
+                )
             raise
 
         # A poster for the library grid, before any variant exists.
@@ -119,13 +146,33 @@ class AssetService:
             size=f"{asset.media.width}x{asset.media.height}",
             duration=asset.media.duration_s,
         )
+        if self.audit:
+            await self.audit.record(
+                AuditAction.ASSET_UPLOADED,
+                actor=actor, asset_id=asset.id,
+                message=f"ingested {asset.original_filename}",
+                detail={
+                    "filename": asset.original_filename,
+                    "kind": asset.kind.value,
+                    "size_bytes": asset.media.size_bytes if asset.media else None,
+                    "dimensions": (
+                        f"{asset.media.width}x{asset.media.height}" if asset.media else None
+                    ),
+                    "duration_s": asset.media.duration_s if asset.media else None,
+                    "sha_prefix": (asset.sha256 or "")[:16] or None,
+                },
+            )
         return asset
 
     # ------------------------------------------------------------------ #
     # jobs
     # ------------------------------------------------------------------ #
     async def submit_job(
-        self, asset_id: str, job_type: JobType, payload: dict | None = None
+        self,
+        asset_id: str,
+        job_type: JobType,
+        payload: dict | None = None,
+        actor: dict | None = None,
     ) -> Job:
         asset = await self.repo.get_asset(asset_id)
         if asset is None:
@@ -134,6 +181,14 @@ class AssetService:
         await self.repo.save_job(job)
         self.queue.enqueue({"job_id": job.id})
         log.info("job.queued", job=job.id, type=job_type.value, asset=asset_id)
+        if self.audit:
+            await self.audit.record(
+                AuditAction.JOB_SUBMITTED,
+                actor=actor, asset_id=asset_id, job_id=job.id,
+                profile_id=(payload or {}).get("profile_id"),
+                message=f"queued {job_type.value}",
+                detail=dict(payload or {}),
+            )
         return job
 
     # ------------------------------------------------------------------ #
@@ -162,7 +217,7 @@ class AssetService:
         variants = await self.repo.list_variants(asset_id)
         return [v for v in variants if v.status is VariantStatus.PUBLISHED]
 
-    async def delete_asset(self, asset_id: str) -> None:
+    async def delete_asset(self, asset_id: str, actor: dict | None = None) -> None:
         asset = await self.get_asset(asset_id)
         for variant in await self.repo.list_variants(asset_id):
             for key in (variant.storage_key, variant.thumbnail_key):
@@ -173,6 +228,12 @@ class AssetService:
                 self.storage.delete(key)
         await self.repo.delete_asset(asset_id)
         log.info("asset.deleted", asset=asset_id)
+        if self.audit:
+            await self.audit.record(
+                AuditAction.ASSET_DELETED,
+                actor=actor, asset_id=asset_id,
+                message=f"deleted {asset.title}",
+            )
 
     async def mark_job(
         self,

@@ -92,6 +92,20 @@ class Settings(BaseSettings):
     keep_quarantined: bool = True
     ffmpeg_threads: int = 0  # 0 = let ffmpeg decide
 
+    # ---- audit ---------------------------------------------------------- #
+    #: How many trailing X-Forwarded-For hops were written by infrastructure we
+    #: control. 0 (local) ignores the header entirely and uses the socket peer.
+    #: Behind one ALB set 1; behind CloudFront -> ALB set 2. Setting this too
+    #: high lets a caller forge the address that gets logged.
+    trusted_proxy_hops: int = 0
+    #: Audit rows carry IP addresses, which are personal data. They are purged
+    #: past this age on startup. 0 disables purging (not advisable in prod).
+    audit_retention_days: int = 90
+    #: Record an audit row for every job transition, not just ingest and
+    #: publication decisions. Verbose, but it is what makes a failed render
+    #: reconstructable.
+    audit_job_events: bool = True
+
     # ---- derived ------------------------------------------------------- #
     @property
     def cors_origins(self) -> list[str]:

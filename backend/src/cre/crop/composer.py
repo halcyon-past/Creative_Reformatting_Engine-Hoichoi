@@ -147,9 +147,9 @@ def _zone_penalties(
             crop.x1 + safe_local.x2, crop.y1 + safe_local.y2,
         )
         for face in faces:
-            if face.box.contained_fraction(crop) < 0.5:
+            if face.integrity_box.contained_fraction(crop) < 0.5:
                 continue
-            inside = face.box.contained_fraction(safe)
+            inside = face.integrity_box.contained_fraction(safe)
             if inside < 0.98:
                 penalty += SAFE_ZONE_PENALTY * (1.0 - inside) * (face.weight / 2.0)
                 notes.append("subject outside action-safe area")
@@ -161,9 +161,9 @@ def _zone_penalties(
             crop.x1 + zone_local.x2, crop.y1 + zone_local.y2,
         )
         for face in faces:
-            if face.box.contained_fraction(crop) < 0.5:
+            if face.integrity_box.contained_fraction(crop) < 0.5:
                 continue
-            overlap = face.box.contained_fraction(reserved)
+            overlap = face.integrity_box.contained_fraction(reserved)
             if overlap > 0.02:
                 penalty += RESERVED_ZONE_PENALTY * overlap * (face.weight / 2.0)
                 notes.append(f"subject overlaps reserved zone '{name}'")
@@ -180,7 +180,10 @@ def _evaluate(
     clipped = intact = dropped = 0
     clip_penalty = 0.0
     for face in smap.protected_faces:
-        fraction = face.box.contained_fraction(crop)
+        # Judged on the facial core, not the padded head. See Subject.core:
+        # scoring the padded head made dropping a close-up subject cheaper
+        # than framing it, because the head already ran off the source frame.
+        fraction = face.integrity_box.contained_fraction(crop)
         if fraction >= INTACT_THRESHOLD:
             intact += 1
         elif fraction <= 0.02:

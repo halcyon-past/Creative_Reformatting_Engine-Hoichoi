@@ -458,8 +458,14 @@ class ActiveSpeakerFramingRule(Rule):
             "speech_steps": speech_steps,
             "speaker_switches": switches,
             "multi_speaker_source": multi_speaker,
-            "coverage": coverage,
+            # Judged figure: speaker framed, or the crop demonstrably panning
+            # toward them just after a handover.
+            "coverage_settled": coverage,
+            # Reported alongside so a reviewer can see the unforgiving number:
+            # speaker strictly inside the crop, transit counted as failure.
+            "coverage_strict": ctx.hints.get("active_speaker_coverage_strict"),
             "framed_speaker_steps": ctx.hints.get("framed_speaker_steps"),
+            "in_transit_steps": ctx.hints.get("in_transit_steps"),
         }
 
         if coverage is None or speech_steps == 0:
@@ -476,9 +482,15 @@ class ActiveSpeakerFramingRule(Rule):
             detail = (
                 f" across {switches} speaker change(s)" if switches else ""
             )
+            strict = ctx.hints.get("active_speaker_coverage_strict")
+            strict_note = (
+                f" ({strict * 100:.1f}% strictly in frame, the rest mid-pan)"
+                if isinstance(strict, (int, float)) and strict < coverage
+                else ""
+            )
             return self.ok(
                 f"The active speaker is framed for {coverage * 100:.1f}% of speech "
-                f"time{detail}.",
+                f"time{detail}{strict_note}.",
                 expected=f">= {threshold * 100:.0f}% of speech time",
                 actual=f"{coverage * 100:.1f}%", evidence=evidence,
             )

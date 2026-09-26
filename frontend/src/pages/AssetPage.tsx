@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { api } from "../api/client";
 import type { Job, Variant } from "../api/types";
+import AuditTrail from "../components/AuditTrail";
 import ComplianceReportView from "../components/ComplianceReport";
 import ReframeTrack from "../components/ReframeTrack";
 import {
@@ -313,7 +314,10 @@ export default function AssetPage() {
           </section>
 
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">Compliance report</h3>
+            <h3 className="text-sm font-semibold text-white">Audit trail</h3>
+            <AuditTrail assetId={assetId} />
+
+            <h3 className="pt-2 text-sm font-semibold text-white">Compliance report</h3>
             {report.isLoading && <Spinner label="Loading report…" />}
             {report.data ? (
               <ComplianceReportView report={report.data.report} />

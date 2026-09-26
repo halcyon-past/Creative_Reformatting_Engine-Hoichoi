@@ -1,0 +1,17 @@
+project     = "hoichoi-cre"
+environment = "dev"
+region      = "ap-south-1"
+
+# Build and push both images first (see docs/AWS_MIGRATION.md):
+image     = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/hoichoi-cre:v1"
+web_image = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/hoichoi-cre-web:v1"
+
+# Lock the UI down before putting real content in.
+allowed_web_cidrs = ["203.0.113.0/24"]
+allowed_origins   = ["http://your-eip-here"]
+
+# Keep inside the 5GB S3 free allowance.
+expire_masters_after_days = 7
+
+# Leave empty and use: aws ssm start-session --target <instance_id>
+ssh_cidrs = []

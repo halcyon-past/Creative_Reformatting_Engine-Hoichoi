@@ -15,12 +15,20 @@ from collections.abc import Coroutine
 from typing import Any
 
 from cre.config import Settings
-from cre.domain.enums import AssetStatus, JobStatus, JobType
+from cre.domain.enums import (
+    AssetStatus,
+    AuditAction,
+    AuditOutcome,
+    JobStatus,
+    JobType,
+    VariantStatus,
+)
 from cre.domain.models import Job
 from cre.logging_config import get_logger
 from cre.ports.queue import JobQueue
 from cre.ports.repository import Repository
 from cre.services.asset_service import AssetService
+from cre.services.audit_service import AuditService
 from cre.services.reformat_service import ReformatService
 
 log = get_logger(__name__)
@@ -57,12 +65,14 @@ class Worker:
         assets: AssetService,
         reformat: ReformatService,
         bridge: _LoopBridge | None = None,
+        audit: AuditService | None = None,
     ) -> None:
         self.settings = settings
         self.queue = queue
         self.repo = repo
         self.assets = assets
         self.reformat = reformat
+        self.audit = audit
         self._bridge = bridge or _LoopBridge()
         self._own_bridge = bridge is None
 
@@ -98,11 +108,57 @@ class Worker:
             self._bridge.call(
                 self.assets.mark_job(job, JobStatus.FAILED, error=str(exc), stage="failed")
             )
+            self._audit(
+                AuditAction.JOB_FAILED,
+                outcome=AuditOutcome.FAILURE,
+                asset_id=job.asset_id, job_id=job.id,
+                message=f"{job.type.value} failed",
+                detail={"error": str(exc)[:500]},
+            )
             asset = self._bridge.call(self.repo.get_asset(job.asset_id))
             if asset is not None:
                 asset.status = AssetStatus.FAILED
                 asset.error = str(exc)
                 self._bridge.call(self.repo.save_asset(asset))
+
+    def _audit(self, action, **kw) -> None:
+        """Fire-and-forget audit write from a worker thread."""
+        if self.audit is None:
+            return
+        try:
+            self._bridge.call(self.audit.record(action, **kw), timeout=30.0)
+        except Exception:  # pragma: no cover - auditing must not fail a job
+            log.warning("worker.audit_failed", action=getattr(action, "value", action))
+
+    def _audit_variants(self, job: Job, variants: list) -> None:
+        """One row per publication decision, with the failing rules attached."""
+        for variant in variants:
+            published = variant.status is VariantStatus.PUBLISHED
+            report = variant.report
+            self._audit(
+                AuditAction.VARIANT_PUBLISHED if published
+                else AuditAction.VARIANT_QUARANTINED,
+                outcome=AuditOutcome.SUCCESS if published else AuditOutcome.FAILURE,
+                asset_id=job.asset_id,
+                variant_id=variant.id,
+                job_id=job.id,
+                profile_id=variant.profile_id,
+                message=(
+                    f"published {variant.profile_id}" if published
+                    else f"quarantined {variant.profile_id}: {variant.error or 'failed compliance'}"
+                ),
+                detail={
+                    "verdict": report.verdict.value if report else None,
+                    "summary": report.summary() if report else None,
+                    "failed_rules": [r.rule_id for r in report.failures] if report else [],
+                    "warned_rules": [r.rule_id for r in report.warnings] if report else [],
+                    "spec": f"{report.spec_id}@{report.spec_version}" if report else None,
+                    "sha256": variant.sha256,
+                    "dimensions": (
+                        f"{variant.width}x{variant.height}" if variant.width else None
+                    ),
+                },
+            )
 
     def _progress(self, job: Job):
         def report(value: float, stage: str) -> None:
@@ -135,6 +191,13 @@ class Worker:
                     result={"faces": analysis.face_track_count},
                 )
             )
+            if self.settings.audit_job_events:
+                self._audit(
+                    AuditAction.JOB_SUCCEEDED,
+                    asset_id=job.asset_id, job_id=job.id,
+                    message="analysis complete",
+                    detail={"face_tracks": analysis.face_track_count},
+                )
             return
 
         if job.type is JobType.REFORMAT_ALL:
@@ -159,6 +222,14 @@ class Worker:
                     },
                 )
             )
+            self._audit_variants(job, variants)
+            if self.settings.audit_job_events:
+                self._audit(
+                    AuditAction.JOB_SUCCEEDED,
+                    asset_id=job.asset_id, job_id=job.id,
+                    message=f"rendered {len(variants)} variant(s)",
+                    detail={"published": published, "total": len(variants)},
+                )
             return
 
         if job.type is JobType.REFORMAT_ONE:
@@ -180,6 +251,13 @@ class Worker:
                     },
                 )
             )
+            self._audit(
+                AuditAction.VARIANT_REGENERATED,
+                asset_id=job.asset_id, job_id=job.id,
+                variant_id=variant.id, profile_id=variant.profile_id,
+                message=f"regenerated {variant.profile_id}",
+            )
+            self._audit_variants(job, [variant])
             return
 
         if job.type is JobType.REVALIDATE:
@@ -197,6 +275,13 @@ class Worker:
                     result={"verdict": variant.report.verdict.value if variant.report else None},
                 )
             )
+            self._audit(
+                AuditAction.VARIANT_REVALIDATED,
+                asset_id=job.asset_id, job_id=job.id,
+                variant_id=variant.id, profile_id=variant.profile_id,
+                message=f"revalidated {variant.profile_id}",
+            )
+            self._audit_variants(job, [variant])
             return
 
         raise ValueError(f"unhandled job type: {job.type}")

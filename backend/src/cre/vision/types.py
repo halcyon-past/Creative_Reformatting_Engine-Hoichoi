@@ -55,12 +55,26 @@ class PersonDetection:
 class Subject:
     """A weighted thing worth composing around."""
 
+    #: Full extent (for a face, the padded head). Drives the importance map and
+    #: composition, so the crop leaves room for hair and chin.
     box: Box
     weight: float
     kind: SubjectKind
     track_id: int | None = None
-    #: Faces are protected: clipping one is a hard failure, not a soft penalty.
+    #: Faces are protected: slicing one is a hard failure, not a soft penalty.
     protect: bool = False
+    #: The part that must not be sliced -- brow to chin, eyes to cheeks.
+    #: Integrity is judged on this rather than on ``box``, for two reasons.
+    #: Trimming a hairline is ordinary close-up framing, not a defect; and on a
+    #: close-up the padded head often runs past the edge of the *source* frame,
+    #: so no crop could ever contain it and scoring against it made dropping
+    #: the subject cheaper than framing it. This also matches what the
+    #: validator measures, so the solver and the validator agree.
+    core: Box | None = None
+
+    @property
+    def integrity_box(self) -> Box:
+        return self.core if self.core is not None else self.box
 
 
 @dataclass(slots=True)

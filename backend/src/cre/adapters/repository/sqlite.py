@@ -11,11 +11,11 @@ import json
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Index, String, select
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Index, String, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from cre.domain.models import Asset, Job, Variant
+from cre.domain.models import Asset, AuditEvent, Job, Variant
 from cre.ports.repository import Repository
 
 
@@ -48,6 +48,27 @@ class VariantRow(Base):
 
 
 Index("ix_variants_asset_profile", VariantRow.asset_id, VariantRow.profile_id, unique=True)
+
+
+class AuditRow(Base):
+    """Append-only audit log.
+
+    Columns are lifted out for the fields an investigation actually filters on
+    (time, action, asset, source address); everything else rides in the JSON
+    document, as elsewhere in this schema.
+    """
+
+    __tablename__ = "audit_events"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    action: Mapped[str] = mapped_column(String(40), index=True)
+    outcome: Mapped[str] = mapped_column(String(16), index=True)
+    actor_ip: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
+    asset_id: Mapped[str | None] = mapped_column(String(40), index=True, nullable=True)
+    variant_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    job_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    document: Mapped[dict[str, Any]] = mapped_column(JSON)
 
 
 class JobRow(Base):
@@ -186,3 +207,43 @@ class SQLiteRepository(Repository):
         async with self._session() as s:
             rows = (await s.execute(stmt)).scalars().all()
         return [Job.model_validate(r.document) for r in rows]
+
+    # ---- audit --------------------------------------------------------- #
+    async def record_audit(self, event: AuditEvent) -> AuditEvent:
+        doc = _dump(event)
+        async with self._session() as s, s.begin():
+            s.add(
+                AuditRow(
+                    id=event.id,
+                    at=event.at,
+                    action=event.action.value,
+                    outcome=event.outcome.value,
+                    actor_ip=event.actor_ip,
+                    asset_id=event.asset_id,
+                    variant_id=event.variant_id,
+                    job_id=event.job_id,
+                    document=doc,
+                )
+            )
+        return event
+
+    async def list_audit(
+        self,
+        asset_id: str | None = None,
+        action: str | None = None,
+        limit: int = 200,
+        offset: int = 0,
+    ) -> list[AuditEvent]:
+        stmt = select(AuditRow).order_by(AuditRow.at.desc()).limit(limit).offset(offset)
+        if asset_id:
+            stmt = stmt.where(AuditRow.asset_id == asset_id)
+        if action:
+            stmt = stmt.where(AuditRow.action == action)
+        async with self._session() as s:
+            rows = (await s.execute(stmt)).scalars().all()
+        return [AuditEvent.model_validate(r.document) for r in rows]
+
+    async def purge_audit_before(self, cutoff: datetime) -> int:
+        async with self._session() as s, s.begin():
+            result = await s.execute(delete(AuditRow).where(AuditRow.at < cutoff))
+        return int(result.rowcount or 0)

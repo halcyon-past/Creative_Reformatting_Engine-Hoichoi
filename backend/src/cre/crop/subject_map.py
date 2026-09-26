@@ -175,13 +175,16 @@ def build_subject_map(
                 head.x1 * to_map, head.y1 * to_map, head.x2 * to_map, head.y2 * to_map
             )
             _draw_gaussian(canvas, scaled, float(weight))
+            # Both boxes are clamped to the frame: what the source already cut
+            # off is not something a crop can be blamed for failing to keep.
             subjects.append(
                 Subject(
-                    box=head,
+                    box=head.clamp_to(frame),
                     weight=float(weight),
                     kind=SubjectKind.FACE,
                     track_id=face.track_id,
                     protect=True,
+                    core=face.box.expand(-0.30).clamp_to(frame),
                 )
             )
 

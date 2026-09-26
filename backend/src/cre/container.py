@@ -15,6 +15,7 @@ from cre.ports.queue import JobQueue
 from cre.ports.repository import Repository
 from cre.ports.storage import Storage
 from cre.services.asset_service import AssetService
+from cre.services.audit_service import AuditService
 from cre.services.reformat_service import ReformatService
 from cre.validation.spec import SpecSheet, get_spec
 from cre.worker.runner import Worker
@@ -73,6 +74,7 @@ class Container:
     storage: Storage
     queue: JobQueue
     repo: Repository
+    audit: AuditService
     assets: AssetService
     reformat: ReformatService
     worker: Worker
@@ -81,6 +83,9 @@ class Container:
         init = getattr(self.repo, "init", None)
         if init is not None:
             await init()
+        # Retention runs before anything is served, so a restart is enough to
+        # enforce a shortened window.
+        await self.audit.purge_expired()
         if start_worker:
             self.worker.start()
         log.info(
@@ -111,11 +116,12 @@ def build_container(settings: Settings | None = None) -> Container:
     queue = build_queue(settings)
     repo = build_repository(settings)
 
-    assets = AssetService(settings, storage, repo, queue)
+    audit = AuditService(settings, repo)
+    assets = AssetService(settings, storage, repo, queue, audit)
     reformat = ReformatService(settings, spec, storage, repo)
-    worker = Worker(settings, queue, repo, assets, reformat)
+    worker = Worker(settings, queue, repo, assets, reformat, audit=audit)
 
     return Container(
         settings=settings, spec=spec, storage=storage, queue=queue, repo=repo,
-        assets=assets, reformat=reformat, worker=worker,
+        audit=audit, assets=assets, reformat=reformat, worker=worker,
     )

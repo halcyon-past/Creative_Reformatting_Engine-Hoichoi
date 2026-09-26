@@ -63,3 +63,22 @@ class SubjectKind(StrEnum):
     FACE = "face"
     PERSON = "person"
     SALIENCY = "saliency"
+
+
+class AuditAction(StrEnum):
+    """Every action worth reconstructing after the fact."""
+
+    ASSET_UPLOADED = "asset.uploaded"
+    ASSET_DELETED = "asset.deleted"
+    JOB_SUBMITTED = "job.submitted"
+    JOB_SUCCEEDED = "job.succeeded"
+    JOB_FAILED = "job.failed"
+    VARIANT_PUBLISHED = "variant.published"
+    VARIANT_QUARANTINED = "variant.quarantined"
+    VARIANT_REGENERATED = "variant.regenerated"
+    VARIANT_REVALIDATED = "variant.revalidated"
+
+
+class AuditOutcome(StrEnum):
+    SUCCESS = "success"
+    FAILURE = "failure"

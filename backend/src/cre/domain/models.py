@@ -9,6 +9,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from cre.domain.enums import (
     AssetStatus,
+    AuditAction,
+    AuditOutcome,
     JobStatus,
     JobType,
     MediaKind,
@@ -223,3 +225,41 @@ class Job(Base):
     created_at: datetime = Field(default_factory=_now)
     started_at: datetime | None = None
     finished_at: datetime | None = None
+
+
+class AuditEvent(Base):
+    """One immutable record of something that happened.
+
+    Written on ingest, on every job transition, and on each publish or
+    quarantine decision, so "where did this asset come from, and why is it in
+    (or out of) the library?" is answerable without re-running anything.
+
+    ``actor_ip`` is personal data under GDPR and most equivalents. It is
+    captured because the brief asks for it and because it is genuinely useful
+    for abuse tracing on an upload endpoint, but it should be given a retention
+    period rather than kept forever -- see ``AUDIT_RETENTION_DAYS`` and the
+    note in docs/AUDIT.md.
+    """
+
+    id: str = Field(default_factory=lambda: _uid("aud"))
+    at: datetime = Field(default_factory=_now)
+    action: AuditAction
+    outcome: AuditOutcome = AuditOutcome.SUCCESS
+
+    # ---- who ----------------------------------------------------------- #
+    actor_ip: str | None = None
+    #: True when the address came from a proxy header we were configured to
+    #: trust. A false value means it is the direct socket peer.
+    actor_ip_forwarded: bool = False
+    user_agent: str | None = None
+    actor_id: str | None = None          # reserved for when auth is added
+
+    # ---- what ---------------------------------------------------------- #
+    asset_id: str | None = None
+    variant_id: str | None = None
+    job_id: str | None = None
+    profile_id: str | None = None
+
+    # ---- detail -------------------------------------------------------- #
+    message: str = ""
+    detail: dict = Field(default_factory=dict)

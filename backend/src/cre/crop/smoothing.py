@@ -60,9 +60,9 @@ class SmoothingConfig:
     #: Natural frequency of the spring, in Hz. Higher = more responsive.
     frequency: float = 1.1
     #: Faster spring used while easing to a new speaker.
-    switch_frequency: float = 2.6
+    switch_frequency: float = 4.2
     #: Duration of the accelerated move after a speaker change, in seconds.
-    switch_duration: float = 0.45
+    switch_duration: float = 0.30
     #: Maximum pan speed as a fraction of frame width per second.
     max_speed: float = 0.85
     #: Zoom (crop width) is smoothed harder than translation; size changes read

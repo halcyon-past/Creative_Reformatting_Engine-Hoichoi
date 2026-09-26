@@ -1,5 +1,6 @@
 import type {
   Asset,
+  AuditEvent,
   ComplianceReport,
   Job,
   ReframePoint,
@@ -73,6 +74,16 @@ export const api = {
     ),
 
   revalidate: (id: string) => request<Job>(`/variants/${id}/revalidate`, { method: "POST" }),
+
+  assetAudit: (id: string) =>
+    request<{ asset_id: string; count: number; events: AuditEvent[] }>(
+      `/assets/${id}/audit`,
+    ),
+
+  audit: (action?: string) =>
+    request<{ count: number; retention_days: number; events: AuditEvent[] }>(
+      `/audit${action ? `?action=${encodeURIComponent(action)}` : ""}`,
+    ),
 
   getJob: (id: string) => request<Job>(`/jobs/${id}`),
   listJobs: (assetId?: string) =>

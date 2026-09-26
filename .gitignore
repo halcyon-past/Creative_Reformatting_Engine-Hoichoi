@@ -1,5 +1,8 @@
 # data & generated media
 data/
+# Evidence bundle: regenerate with scripts/make_diagnostics.py. Not committed
+# because it contains rendered copies of the source media.
+diagnostics/
 !data/.gitkeep
 test_sample/*
 !test_sample/.gitkeep

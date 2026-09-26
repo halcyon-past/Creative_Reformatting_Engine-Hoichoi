@@ -82,8 +82,8 @@ class ActiveSpeakerDetector:
         analysis_fps: float,
         window_s: float = 1.0,
         max_lag_s: float = 0.25,
-        switch_margin: float = 0.12,
-        min_dwell_s: float = 0.55,
+        switch_margin: float = 0.22,
+        min_dwell_s: float = 1.2,
     ) -> None:
         self.analysis_fps = analysis_fps
         self.window = max(3, int(round(window_s * analysis_fps)))

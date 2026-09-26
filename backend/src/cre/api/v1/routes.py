@@ -11,9 +11,11 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
+    Request,
     UploadFile,
 )
 
+from cre.api.request_context import describe
 from cre.api.schemas import (
     AssetOut,
     JobOut,
@@ -38,6 +40,11 @@ def get_container() -> Container:  # overridden in main.py via dependency_overri
 
 
 Ctr = Annotated[Container, Depends(get_container)]
+
+
+def actor_of(request: Request, container: Container) -> dict:
+    """Who is making this call, as recorded in the audit trail."""
+    return describe(request, container.settings.trusted_proxy_hops)
 
 
 def _url(container: Container, key: str | None) -> str | None:
@@ -119,18 +126,26 @@ async def get_spec_sheet(container: Ctr) -> SpecOut:
 # --------------------------------------------------------------------------- #
 @router.post("/assets", response_model=UploadResponse, status_code=201, tags=["assets"])
 async def upload_asset(
+    request: Request,
     container: Ctr,
     file: Annotated[UploadFile, File(description="Master image or video")],
     title: Annotated[str | None, Form()] = None,
     auto_reformat: Annotated[bool, Form()] = True,
 ) -> UploadResponse:
-    """Ingest a master asset and, by default, queue the full render set."""
+    """Ingest a master asset and, by default, queue the full render set.
+
+    The caller's address is recorded against the upload. See
+    ``cre.api.request_context`` for how it is derived behind a proxy.
+    """
+    actor = actor_of(request, container)
     asset = await container.assets.ingest_stream(
-        file.file, file.filename or "upload", title=title
+        file.file, file.filename or "upload", title=title, actor=actor
     )
     job = None
     if auto_reformat:
-        job = await container.assets.submit_job(asset.id, JobType.REFORMAT_ALL)
+        job = await container.assets.submit_job(
+            asset.id, JobType.REFORMAT_ALL, actor=actor
+        )
     return UploadResponse(
         asset=await _asset_out(container, asset),
         job=JobOut.build(job) if job else None,
@@ -154,20 +169,24 @@ async def get_asset(container: Ctr, asset_id: str) -> AssetOut:
 
 
 @router.delete("/assets/{asset_id}", status_code=204, tags=["assets"])
-async def delete_asset(container: Ctr, asset_id: str) -> None:
-    await container.assets.delete_asset(asset_id)
+async def delete_asset(request: Request, container: Ctr, asset_id: str) -> None:
+    await container.assets.delete_asset(asset_id, actor=actor_of(request, container))
 
 
 @router.post("/assets/{asset_id}/reformat", response_model=JobOut, status_code=202, tags=["assets"])
-async def reformat_asset(container: Ctr, asset_id: str) -> JobOut:
+async def reformat_asset(request: Request, container: Ctr, asset_id: str) -> JobOut:
     """Queue a full re-render of every profile in this asset's render set."""
-    job = await container.assets.submit_job(asset_id, JobType.REFORMAT_ALL)
+    job = await container.assets.submit_job(
+        asset_id, JobType.REFORMAT_ALL, actor=actor_of(request, container)
+    )
     return JobOut.build(job)
 
 
 @router.post("/assets/{asset_id}/analyze", response_model=JobOut, status_code=202, tags=["assets"])
-async def analyze_asset(container: Ctr, asset_id: str) -> JobOut:
-    job = await container.assets.submit_job(asset_id, JobType.ANALYZE)
+async def analyze_asset(request: Request, container: Ctr, asset_id: str) -> JobOut:
+    job = await container.assets.submit_job(
+        asset_id, JobType.ANALYZE, actor=actor_of(request, container)
+    )
     return JobOut.build(job)
 
 
@@ -176,12 +195,13 @@ async def analyze_asset(container: Ctr, asset_id: str) -> JobOut:
     response_model=JobOut, status_code=202, tags=["variants"],
 )
 async def regenerate_variant(
-    container: Ctr, asset_id: str, body: RegenerateRequest
+    request: Request, container: Ctr, asset_id: str, body: RegenerateRequest
 ) -> JobOut:
     """Re-render exactly one variant, leaving the rest of the library untouched."""
     container.spec.profile(body.profile_id)  # 404s on an unknown profile
     job = await container.assets.submit_job(
-        asset_id, JobType.REFORMAT_ONE, {"profile_id": body.profile_id}
+        asset_id, JobType.REFORMAT_ONE, {"profile_id": body.profile_id},
+        actor=actor_of(request, container),
     )
     return JobOut.build(job)
 
@@ -243,10 +263,13 @@ async def get_reframe_path(container: Ctr, variant_id: str) -> dict:
     "/variants/{variant_id}/revalidate", response_model=JobOut, status_code=202,
     tags=["validation"],
 )
-async def revalidate_variant(container: Ctr, variant_id: str) -> JobOut:
+async def revalidate_variant(
+    request: Request, container: Ctr, variant_id: str
+) -> JobOut:
     variant = await container.assets.get_variant(variant_id)
     job = await container.assets.submit_job(
-        variant.asset_id, JobType.REVALIDATE, {"variant_id": variant_id}
+        variant.asset_id, JobType.REVALIDATE, {"variant_id": variant_id},
+        actor=actor_of(request, container),
     )
     return JobOut.build(job)
 
@@ -270,3 +293,41 @@ async def list_jobs(
 ) -> list[JobOut]:
     jobs = await container.repo.list_jobs(asset_id=asset_id, limit=limit)
     return [JobOut.build(j) for j in jobs]
+
+
+# --------------------------------------------------------------------------- #
+# audit
+# --------------------------------------------------------------------------- #
+@router.get("/audit", tags=["audit"])
+async def list_audit(
+    container: Ctr,
+    asset_id: Annotated[str | None, Query()] = None,
+    action: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 200,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> dict:
+    """The audit trail: who did what, from where, and what the system decided.
+
+    Append-only. Rows are purged past ``CRE_AUDIT_RETENTION_DAYS`` because they
+    carry IP addresses.
+    """
+    events = await container.audit.list(
+        asset_id=asset_id, action=action, limit=limit, offset=offset
+    )
+    return {
+        "count": len(events),
+        "retention_days": container.settings.audit_retention_days,
+        "events": [e.model_dump(mode="json") for e in events],
+    }
+
+
+@router.get("/assets/{asset_id}/audit", tags=["audit"])
+async def asset_audit(container: Ctr, asset_id: str) -> dict:
+    """Full provenance for one asset, oldest last."""
+    await container.assets.get_asset(asset_id)
+    events = await container.audit.list(asset_id=asset_id, limit=500)
+    return {
+        "asset_id": asset_id,
+        "count": len(events),
+        "events": [e.model_dump(mode="json") for e in events],
+    }

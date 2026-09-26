@@ -140,3 +140,19 @@ export interface ReframePoint {
   active_track_id: number | null;
   shot_id: number;
 }
+
+export interface AuditEvent {
+  id: string;
+  at: string;
+  action: string;
+  outcome: "success" | "failure";
+  actor_ip: string | null;
+  actor_ip_forwarded: boolean;
+  user_agent: string | null;
+  asset_id: string | null;
+  variant_id: string | null;
+  job_id: string | null;
+  profile_id: string | null;
+  message: string;
+  detail: Record<string, unknown>;
+}

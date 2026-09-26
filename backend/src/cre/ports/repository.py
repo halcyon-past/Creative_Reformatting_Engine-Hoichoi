@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import datetime
 
-from cre.domain.models import Asset, Job, Variant
+from cre.domain.models import Asset, AuditEvent, Job, Variant
 
 
 class Repository(ABC):
@@ -43,3 +44,24 @@ class Repository(ABC):
 
     @abstractmethod
     async def list_jobs(self, asset_id: str | None = None, limit: int = 50) -> list[Job]: ...
+
+    # ---- audit --------------------------------------------------------- #
+    @abstractmethod
+    async def record_audit(self, event: AuditEvent) -> AuditEvent:
+        """Append an audit record. Audit rows are never updated or deleted."""
+
+    @abstractmethod
+    async def list_audit(
+        self,
+        asset_id: str | None = None,
+        action: str | None = None,
+        limit: int = 200,
+        offset: int = 0,
+    ) -> list[AuditEvent]: ...
+
+    @abstractmethod
+    async def purge_audit_before(self, cutoff: datetime) -> int:
+        """Delete audit rows older than *cutoff*. Returns the number removed.
+
+        Retention exists because audit rows carry IP addresses.
+        """

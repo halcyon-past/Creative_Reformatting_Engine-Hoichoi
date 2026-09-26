@@ -15,6 +15,7 @@ automated compliance report against a machine-readable spec sheet.**
 | **Crop** | Detects faces and bodies, builds a weighted *subject importance map*, and solves for the crop window that maximises retained subject importance under hard face-integrity and safe-zone constraints. The centre of the frame carries no special status. |
 | **Reframe** | Tracks faces across analysis frames, measures per-face mouth articulation, correlates it against the audio envelope, and pans the crop to whoever is speaking — with hysteresis so it does not oscillate, and hard cuts at shot boundaries. |
 | **Validate** | Re-detects subjects **in the rendered output** and checks 18 rules covering geometry, container, codecs, quality, face integrity, safe zones, platform UI chrome, crop motion and speaker framing. PASS publishes; FAIL quarantines with evidence. |
+| **Audit** | Append-only trail of every upload, job and publication decision, with the caller's IP captured safely behind a proxy. See [docs/AUDIT.md](docs/AUDIT.md). |
 
 ---
 
@@ -23,20 +24,40 @@ automated compliance report against a machine-readable spec sheet.**
 Requires Python 3.11–3.12 and Node 20+. `ffmpeg` is bundled via pip, so nothing
 needs to be on `PATH`.
 
+### Windows (PowerShell)
+
+`make` is not on Windows by default, so use the bundled task runner. Forward
+slashes work fine in PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ./run.ps1 setup   # venv + deps + models + npm
+powershell -ExecutionPolicy Bypass -File ./run.ps1 demo    # both samples, end to end
+powershell -ExecutionPolicy Bypass -File ./run.ps1 stack   # API :8000 + UI :5173
+```
+
+After allowing local scripts once
+(`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`) the short form works:
+`./run.ps1 demo`.
+
+The runner is only a convenience wrapper. The CLI works directly too:
+
+```powershell
+.venv/Scripts/python.exe -m cre.cli process test_sample/input_image.png
+.venv/Scripts/python.exe -m cre.cli process test_sample/input_video.mp4
+.venv/Scripts/python.exe -m uvicorn cre.main:app --reload --port 8000
+cd frontend; npm run dev
+```
+
+### macOS / Linux
+
 ```bash
-make setup                     # venv + deps + vision models + npm install
-cp .env.example .env
-
-# headless, end to end
-make process FILE=test_sample/input_image.png
-make process FILE=test_sample/input_video.mp4
-
-# or the full stack
+make setup
+make demo
 make api                       # :8000  API + in-process worker
 make web                       # :5173  UI (proxies /api and /media)
 ```
 
-Docker, if you prefer: `make up` → UI on `:8080`, API on `:8000`.
+Docker, either platform: `docker compose up --build` → UI on `:8080`.
 
 ### Results on the supplied test assets
 
@@ -178,14 +199,48 @@ The publication gate lives in exactly one place
 (`services/reformat_service.py`): render → validate → PASS ? publish :
 quarantine. "No asset enters unvalidated" is structural, not conventional.
 
-| Concern | Local | AWS |
-|---|---|---|
-| Storage | `data/` directory | S3 + CloudFront |
-| Queue | thread pool | SQS + DLQ |
-| Metadata | SQLite | Aurora Serverless v2 |
-| Worker | in-process | separate ECS service, scaled on queue depth |
+| Concern | Local | AWS (scalable) | AWS (free tier) |
+|---|---|---|---|
+| Storage | `data/` directory | S3 + CloudFront | S3 |
+| Queue | thread pool | SQS + DLQ | SQS + DLQ |
+| Metadata | SQLite | Aurora Serverless v2 | SQLite on EBS |
+| Compute | in-process worker | ECS Fargate, scaled on queue depth | one `t3.micro` |
 
-Switching is environment only — see `.env.example` and `infra/aws/`.
+Switching is environment only — see `.env.example`.
+
+Two Terraform stacks are provided:
+
+- **`infra/aws/`** — the scalable topology: Fargate, Aurora, ALB, autoscaling on
+  queue backlog. Not free.
+- **`infra/aws/free-tier/`** — everything inside the AWS Free Tier: one EC2
+  `t3.micro`, SQLite on EBS, no NAT gateway, no load balancer. See
+  [docs/FREE_TIER.md](docs/FREE_TIER.md), which is candid about the three things
+  that will bite you (1 GB of RAM, the 5 GB S3 ceiling, and CPU credits).
+
+## Audit trail
+
+Every upload, job and publication decision is appended to an append-only
+`audit_events` table, together with the caller's address:
+
+```
+action                     outcome   actor_ip         fwd    message
+asset.uploaded             success   198.51.100.77    True   ingested input_image.png
+job.submitted              success   198.51.100.77    True   queued reformat_all
+variant.published          success   -                False  published hero_landscape_16x9
+variant.quarantined        failure   -                False  quarantined reel_9x16: subject.active_speaker
+```
+
+`X-Forwarded-For` is **not** trusted blindly — doing so lets a caller forge the
+one field whose purpose is attribution. `CRE_TRUSTED_PROXY_HOPS` says how many
+trailing hops were written by infrastructure you control, and the address is
+read from there. IP addresses are personal data, so rows are purged past
+`CRE_AUDIT_RETENTION_DAYS` (default 90). Full reasoning in
+[docs/AUDIT.md](docs/AUDIT.md).
+
+```
+GET /api/v1/audit?action=variant.quarantined
+GET /api/v1/assets/{id}/audit
+```
 
 ---
 
@@ -223,7 +278,20 @@ are. The suite asserts the properties the brief names, including:
 | `GET` | `/api/v1/variants/{id}/reframe-path` | the solved crop path |
 | `GET` | `/api/v1/jobs/{id}` | job progress |
 
+| `GET` | `/api/v1/audit` | the audit trail, filterable by action |
+| `GET` | `/api/v1/assets/{id}/audit` | full provenance for one asset |
+
 Interactive docs at `/docs`.
+
+## Inspecting the output
+
+```powershell
+.venv/Scripts/python.exe scripts/make_diagnostics.py
+```
+
+Writes `diagnostics/index.html`: every variant with its verdict, the crop
+rationale that produced it, filmstrips for reels, the compliance findings and
+the audit trail. Open it to check the system's verdicts against the pixels.
 
 ---
 
