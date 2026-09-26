@@ -30,7 +30,7 @@ automated compliance report against a machine-readable spec sheet.**
 
 ## 🎥 4-Minute Pitch Demo Video
 
-[![Watch the 4-minute pitch demo video](demo_video/thumbnail.png)](https://drive.google.com/file/d/1vmCmVuZ7MvNpbe7scaPS9jE-4KTVcerq/view?usp=sharing)
+[![Watch the 4-minute pitch demo video](assets/thumbnail.png)](https://drive.google.com/file/d/1vmCmVuZ7MvNpbe7scaPS9jE-4KTVcerq/view?usp=sharing)
 
 > ▶️ Click the thumbnail above to watch on Google Drive *(1080p Full HD · 4m 20s)*  
 > *Neobrutalist motion graphics · real-time trajectory graphs · broadcast voiceover · 116 BPM tech-pop soundtrack*

@@ -7,8 +7,8 @@ diagnostics/
 test_sample/*
 !test_sample/.gitkeep
 # demo video: keep ONLY the thumbnail
-demo_video/*
-!demo_video/thumbnail.png
+assets/*
+!assets/thumbnail.png
 
 
 # python
