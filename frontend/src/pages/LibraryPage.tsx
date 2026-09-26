@@ -1,12 +1,20 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { ErrorBox, Spinner, formatBytes } from "../components/common";
 import { UploadModal } from "../components/UploadModal";
-import type { Asset } from "../api/types";
+import type { Asset, Job } from "../api/types";
 
-function AssetCard({ asset, onDelete }: { asset: Asset; onDelete: (id: string) => void }) {
+function AssetCard({
+  asset,
+  activeJob,
+  onDelete,
+}: {
+  asset: Asset;
+  activeJob?: Job;
+  onDelete: (id: string) => void;
+}) {
   const complete = asset.variant_count > 0;
   const allPassed = complete && asset.published_count === asset.variant_count;
 
@@ -35,6 +43,27 @@ function AssetCard({ asset, onDelete }: { asset: Asset; onDelete: (id: string) =
               </span>
             )}
           </div>
+
+          {/* Active Processing Overlay on Thumbnail */}
+          {activeJob && (
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2.5">
+              <div className="flex items-center justify-between text-[11px] text-white">
+                <span className="flex items-center gap-1.5 font-medium truncate">
+                  <span className="h-2 w-2 animate-spin rounded-full border border-sky-400 border-t-transparent shrink-0" />
+                  <span className="truncate">{activeJob.stage ?? "Processing…"}</span>
+                </span>
+                <span className="font-mono font-bold text-accent shrink-0 ml-1">
+                  {Math.round(activeJob.progress * 100)}%
+                </span>
+              </div>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-ink-950/80 border border-ink-600/60">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-sky-400 via-accent to-emerald-400 transition-all duration-300"
+                  style={{ width: `${Math.max(5, Math.round(activeJob.progress * 100))}%` }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </Link>
 
@@ -82,6 +111,14 @@ function AssetCard({ asset, onDelete }: { asset: Asset; onDelete: (id: string) =
               <span className="inline-flex items-center rounded px-1.5 py-0.5 font-medium bg-rose-500/15 text-rose-300 border border-rose-500/20">
                 Failed
               </span>
+            ) : activeJob ? (
+              <span className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium bg-sky-500/15 text-sky-300 border border-sky-500/20">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-400" />
+                <span>Processing</span>
+                <span className="font-mono font-bold text-accent">
+                  {Math.round(activeJob.progress * 100)}%
+                </span>
+              </span>
             ) : (
               <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium bg-sky-500/15 text-sky-300 border border-sky-500/20">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-400" />
@@ -103,6 +140,7 @@ function AssetCard({ asset, onDelete }: { asset: Asset; onDelete: (id: string) =
 }
 
 export default function LibraryPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -116,6 +154,27 @@ export default function LibraryPage() {
       return busy ? 2000 : false;
     },
   });
+
+  const jobs = useQuery({
+    queryKey: ["jobs"],
+    queryFn: () => api.listJobs(undefined, 50),
+    refetchInterval: (query) => {
+      const data = query.state.data as Job[] | undefined;
+      const hasActive = data?.some((j) => j.status === "queued" || j.status === "running");
+      return hasActive ? 1200 : 3000;
+    },
+  });
+
+  const activeJobsByAssetId = useMemo(() => {
+    const map = new Map<string, Job>();
+    if (!jobs.data) return map;
+    for (const j of jobs.data) {
+      if ((j.status === "queued" || j.status === "running") && !map.has(j.asset_id)) {
+        map.set(j.asset_id, j);
+      }
+    }
+    return map;
+  }, [jobs.data]);
 
   const upload = useMutation({
     mutationFn: async ({
@@ -131,9 +190,13 @@ export default function LibraryPage() {
     }) => {
       return api.upload(file, title, profileIds, autoReformat);
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
       setIsUploadOpen(false);
       queryClient.invalidateQueries({ queryKey: ["assets"] });
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      if (res?.asset?.id) {
+        navigate(`/assets/${res.asset.id}`);
+      }
     },
     onError: (error: Error) => setUploadError(error.message),
   });
@@ -231,7 +294,12 @@ export default function LibraryPage() {
       {assets.data && assets.data.length > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {assets.data.map((asset) => (
-            <AssetCard key={asset.id} asset={asset} onDelete={remove.mutate} />
+            <AssetCard
+              key={asset.id}
+              asset={asset}
+              activeJob={activeJobsByAssetId.get(asset.id)}
+              onDelete={remove.mutate}
+            />
           ))}
         </div>
       )}

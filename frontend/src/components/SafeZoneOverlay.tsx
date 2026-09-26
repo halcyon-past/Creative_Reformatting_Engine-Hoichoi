@@ -53,16 +53,24 @@ export function SafeZoneOverlay({
       {/* Platform UI Chrome (Only for 9:16 Story / Reel formats) */}
       {showPlatformChrome && isVertical && (
         <>
+          {/* Subtle Smartphone Camera Notch */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-3.5 w-20 rounded-b-xl bg-black/70 border-b border-x border-white/10 flex items-center justify-center gap-2 z-20">
+            <div className="h-1.5 w-1.5 rounded-full bg-slate-900 border border-slate-700" />
+            <div className="h-1 w-6 rounded-full bg-slate-800" />
+          </div>
+
           {/* Top Status Bar & Profile header */}
           <div
-            className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent px-3 pt-2 pb-6 text-white/80"
-            style={{ height: "12%" }}
+            className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent px-3.5 pt-4 pb-6 text-white/90"
+            style={{ height: "13%" }}
           >
             <div className="flex items-center gap-1.5">
-              <div className="h-4 w-4 rounded-full bg-white/30" />
+              <div className="h-4 w-4 rounded-full bg-accent/80 flex items-center justify-center text-[9px] font-bold text-ink-950">
+                H
+              </div>
               <span className="text-[10px] font-semibold tracking-wide">hoichoi.tv</span>
             </div>
-            <span className="rounded bg-rose-500/80 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider">
+            <span className="rounded bg-rose-500/80 px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider shadow-sm">
               Protected Chrome
             </span>
           </div>

@@ -13,22 +13,43 @@ import { AVAILABLE_PROFILES } from "../components/RatioSelector";
 import {
   Empty,
   ErrorBox,
-  ProgressBar,
   RatioBadge,
   Spinner,
   VerdictChip,
   formatBytes,
 } from "../components/common";
 
-function VariantPreview({
-  variant,
-  showSafeZones,
-  showPlatformChrome,
-}: {
-  variant: Variant;
-  showSafeZones: boolean;
-  showPlatformChrome: boolean;
-}) {
+function formatStageName(stage: string | null | undefined): string {
+  if (!stage) return "Preparing media pipeline…";
+  const s = stage.toLowerCase();
+  if (s.includes("analysing master")) {
+    return "Analysing master image (faces, saliency & layout)…";
+  }
+  if (s.includes("analysing video")) {
+    return "Analysing video (face tracking, shot cuts & active speaker VAD)…";
+  }
+  if (s.includes("analysis record")) {
+    return "Building multi-speaker timeline & reframe trajectories…";
+  }
+  if (s.includes("rendering reel")) {
+    return "Rendering vertical reel with active-speaker camera pan…";
+  }
+  if (s.includes("validating reel")) {
+    return "Validating vertical reel against platform delivery specs…";
+  }
+  if (s.includes("extracting still")) {
+    return "Extracting peak-sharpness still & framing around subjects…";
+  }
+  if (s.startsWith("rendering ")) {
+    return `Rendering ${stage.replace(/rendering /i, "")}…`;
+  }
+  if (s === "done") {
+    return "Pipeline complete · Assets verified and published";
+  }
+  return stage.charAt(0).toUpperCase() + stage.slice(1);
+}
+
+function VariantCardPreview({ variant }: { variant: Variant }) {
   if (!variant.url) {
     return (
       <div className="flex h-full items-center justify-center font-mono text-xs text-slate-500">
@@ -42,8 +63,8 @@ function VariantPreview({
       {variant.kind === "video" ? (
         <video
           src={variant.url}
-          controls
-          loop
+          controls={false}
+          muted
           playsInline
           className="h-full w-full object-contain"
         />
@@ -54,13 +75,102 @@ function VariantPreview({
           className="h-full w-full object-contain"
         />
       )}
+    </div>
+  );
+}
 
-      {/* Safe-Zone Overlay */}
-      <SafeZoneOverlay
-        ratio={variant.ratio_label}
-        showSafeZones={showSafeZones}
-        showPlatformChrome={showPlatformChrome}
-      />
+function InspectorPreview({
+  variant,
+  showSafeZones,
+  showPlatformChrome,
+}: {
+  variant: Variant;
+  showSafeZones: boolean;
+  showPlatformChrome: boolean;
+}) {
+  if (!variant.url) {
+    return (
+      <div className="flex h-64 items-center justify-center font-mono text-xs text-slate-500">
+        no output rendered
+      </div>
+    );
+  }
+
+  const isVertical = variant.ratio_label === "9:16";
+  const isSquare = variant.ratio_label === "1:1";
+  const isPortrait = variant.ratio_label === "4:5";
+
+  return (
+    <div className="flex flex-col items-center">
+      {/* Platform & Frame Resolution Badge */}
+      <div className="mb-3.5 flex items-center gap-2">
+        <div className="flex items-center gap-2 rounded-full border border-ink-600/90 bg-ink-800/95 px-3.5 py-1 text-[11px] font-mono text-slate-200 shadow-sm backdrop-blur-xs">
+          <span
+            className={clsx(
+              "h-2 w-2 rounded-full",
+              isVertical ? "bg-emerald-400 animate-pulse" : "bg-accent"
+            )}
+          />
+          <span className="font-semibold text-white">
+            {isVertical
+              ? "Smartphone Reel Frame (9:16)"
+              : isSquare
+              ? "Square Feed Canvas (1:1)"
+              : isPortrait
+              ? "Portrait Feed Frame (4:5)"
+              : "Widescreen OTT Canvas (16:9)"}
+          </span>
+          <span className="text-slate-500">·</span>
+          <span className="text-slate-300">{variant.width}×{variant.height}</span>
+          {variant.duration_s ? (
+            <>
+              <span className="text-slate-500">·</span>
+              <span className="text-slate-300">{variant.duration_s.toFixed(1)}s</span>
+            </>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Aspect-Locked Viewport Stage */}
+      <div
+        className={clsx(
+          "relative overflow-hidden shadow-2xl bg-black transition-all",
+          isVertical &&
+            "h-[560px] max-h-[72vh] aspect-[9/16] rounded-[32px] border-[6px] border-slate-700 ring-1 ring-white/10",
+          isSquare &&
+            "h-[420px] max-h-[65vh] aspect-square rounded-xl border-2 border-slate-700 ring-1 ring-white/10",
+          isPortrait &&
+            "h-[490px] max-h-[70vh] aspect-[4/5] rounded-xl border-2 border-slate-700 ring-1 ring-white/10",
+          !isVertical &&
+            !isSquare &&
+            !isPortrait &&
+            "w-full max-w-3xl aspect-video rounded-xl border-2 border-slate-700 ring-1 ring-white/10"
+        )}
+      >
+        {variant.kind === "video" ? (
+          <video
+            key={variant.url}
+            src={variant.url}
+            controls
+            loop
+            playsInline
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <img
+            src={variant.url}
+            alt={variant.profile_id}
+            className="h-full w-full object-cover"
+          />
+        )}
+
+        {/* Safe-Zone Overlay accurately bounded to this exact frame! */}
+        <SafeZoneOverlay
+          ratio={variant.ratio_label}
+          showSafeZones={showSafeZones}
+          showPlatformChrome={showPlatformChrome}
+        />
+      </div>
     </div>
   );
 }
@@ -94,11 +204,7 @@ function VariantCard({
         className="block w-full text-left focus:outline-none"
       >
         <div className="checker relative flex h-60 items-center justify-center bg-ink-900 border-b border-ink-600/60">
-          <VariantPreview
-            variant={variant}
-            showSafeZones={false}
-            showPlatformChrome={false}
-          />
+          <VariantCardPreview variant={variant} />
           <div className="absolute top-2 left-2 flex items-center gap-1.5">
             <RatioBadge ratio={variant.ratio_label} />
           </div>
@@ -162,7 +268,7 @@ export default function AssetPage() {
   const { assetId = "" } = useParams();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [activeJob, setActiveJob] = useState<Job | null>(null);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const [isReformatModalOpen, setIsReformatModalOpen] = useState(false);
 
   // Inspector overlay controls
@@ -171,42 +277,63 @@ export default function AssetPage() {
 
   const asset = useQuery({ queryKey: ["asset", assetId], queryFn: () => api.getAsset(assetId) });
 
+  // Query jobs for this asset with automatic polling when active
+  const jobs = useQuery({
+    queryKey: ["jobs", assetId],
+    queryFn: () => api.listJobs(assetId, 10),
+    refetchInterval: (query) => {
+      const data = query.state.data as Job[] | undefined;
+      const hasActive = data?.some((j) => j.status === "queued" || j.status === "running");
+      return hasActive || activeJobId ? 1000 : false;
+    },
+  });
+
+  // Determine current active job
+  const activeJob =
+    jobs.data?.find((j) => j.status === "queued" || j.status === "running") ??
+    (activeJobId ? jobs.data?.find((j) => j.id === activeJobId) : null) ??
+    null;
+
   const variants = useQuery({
     queryKey: ["variants", assetId],
     queryFn: () => api.listVariants(assetId),
     refetchInterval: activeJob ? 1500 : false,
   });
 
-  const job = useQuery({
-    queryKey: ["job", activeJob?.id],
-    queryFn: () => api.getJob(activeJob!.id),
-    enabled: !!activeJob,
-    refetchInterval: 1000,
-  });
-
-  // Once the worker finishes, refresh the variant list and stop polling.
+  // When active job finishes, refresh variants and asset data
   useEffect(() => {
-    const status = job.data?.status;
-    if (status === "succeeded" || status === "failed") {
-      setActiveJob(null);
-      queryClient.invalidateQueries({ queryKey: ["variants", assetId] });
-      queryClient.invalidateQueries({ queryKey: ["asset", assetId] });
+    if (jobs.data) {
+      const hasActive = jobs.data.some((j) => j.status === "queued" || j.status === "running");
+      if (!hasActive && activeJobId) {
+        setActiveJobId(null);
+        queryClient.invalidateQueries({ queryKey: ["variants", assetId] });
+        queryClient.invalidateQueries({ queryKey: ["asset", assetId] });
+      }
     }
-  }, [job.data?.status, assetId, queryClient]);
+  }, [jobs.data, activeJobId, assetId, queryClient]);
 
   const regenerate = useMutation({
     mutationFn: (profileId: string) => api.regenerate(assetId, profileId),
-    onSuccess: setActiveJob,
+    onSuccess: (job) => {
+      setActiveJobId(job.id);
+      queryClient.invalidateQueries({ queryKey: ["jobs", assetId] });
+    },
   });
 
   const reformatSpecific = useMutation({
     mutationFn: (profileIds: string[]) => api.reformat(assetId, profileIds),
-    onSuccess: setActiveJob,
+    onSuccess: (job) => {
+      setActiveJobId(job.id);
+      queryClient.invalidateQueries({ queryKey: ["jobs", assetId] });
+    },
   });
 
   const reformatAll = useMutation({
     mutationFn: () => api.reformat(assetId),
-    onSuccess: setActiveJob,
+    onSuccess: (job) => {
+      setActiveJobId(job.id);
+      queryClient.invalidateQueries({ queryKey: ["jobs", assetId] });
+    },
   });
 
   const selected =
@@ -325,17 +452,46 @@ export default function AssetPage() {
 
       {/* Active Pipeline Progress */}
       {activeJob && (
-        <div className="card space-y-2.5 p-4 border-accent/40 bg-ink-800 shadow-md">
-          <div className="flex items-center justify-between text-xs text-slate-200">
-            <span className="flex items-center gap-2 font-medium">
-              <span className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-              Stage: {job.data?.stage ?? "queued"} · {job.data?.type ?? activeJob.type}
-            </span>
-            <span className="font-mono font-semibold text-accent">
-              {Math.round((job.data?.progress ?? 0) * 100)}%
+        <div className="card space-y-3 p-5 border-accent/50 bg-gradient-to-br from-ink-800 to-ink-900 shadow-xl ring-1 ring-accent/30">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="relative flex h-3.5 w-3.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-accent" />
+              </span>
+              <div>
+                <span className="text-sm font-semibold text-white">
+                  {formatStageName(activeJob.stage)}
+                </span>
+                <p className="text-[11px] font-mono text-slate-400">
+                  Job ID: {activeJob.id.slice(0, 8)} · Type: {activeJob.type} · Status: {activeJob.status}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="rounded-lg border border-accent/40 bg-accent/15 px-3 py-1 font-mono text-base font-bold text-accent shadow-sm">
+                {Math.round((activeJob.progress ?? 0) * 100)}%
+              </span>
+            </div>
+          </div>
+
+          {/* Granular Animated Progress Bar */}
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-ink-950 border border-ink-600/80 shadow-inner">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-sky-400 via-accent to-emerald-400 transition-all duration-300 shadow-md"
+              style={{ width: `${Math.max(4, Math.round((activeJob.progress ?? 0) * 100))}%` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <span>Stage: {activeJob.stage ?? "Processing"}</span>
+            <span>
+              {activeJob.progress >= 1.0
+                ? "Finalizing…"
+                : `${Math.round((activeJob.progress ?? 0) * 100)}% completed`}
             </span>
           </div>
-          <ProgressBar value={job.data?.progress ?? 0} />
         </div>
       )}
 
@@ -423,9 +579,9 @@ export default function AssetPage() {
             </div>
           </div>
 
-          {/* Large Live Preview with Overlays */}
-          <div className="checker relative flex max-h-[500px] min-h-[320px] w-full items-center justify-center overflow-hidden rounded-xl border border-ink-600 bg-ink-900 shadow-inner">
-            <VariantPreview
+          {/* Workstation Inspection Stage with Device Mockup */}
+          <div className="checker relative flex min-h-[580px] w-full items-center justify-center overflow-hidden rounded-xl border border-ink-600 bg-ink-950/90 p-4 sm:p-8 shadow-inner">
+            <InspectorPreview
               variant={selected}
               showSafeZones={showSafeZones}
               showPlatformChrome={showPlatformChrome}

@@ -98,6 +98,11 @@ export const api = {
     ),
 
   getJob: (id: string) => request<Job>(`/jobs/${id}`),
-  listJobs: (assetId?: string) =>
-    request<Job[]>(`/jobs${assetId ? `?asset_id=${assetId}` : ""}`),
+  listJobs: (assetId?: string, limit: number = 50) => {
+    const params = new URLSearchParams();
+    if (assetId) params.append("asset_id", assetId);
+    if (limit) params.append("limit", String(limit));
+    const qs = params.toString();
+    return request<Job[]>(`/jobs${qs ? `?${qs}` : ""}`);
+  },
 };
