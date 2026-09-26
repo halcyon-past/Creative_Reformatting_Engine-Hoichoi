@@ -28,10 +28,29 @@ a clean still pulled from video, and a subject-tracked, active-speaker-aware
 vertical reel. **No derived asset enters the library until it passes an
 automated compliance report against a machine-readable spec sheet.**
 
-> 🎥 **Pitch demo**: [`demo_video/creative_reformatting_engine_pitch_demo.mp4`](demo_video/creative_reformatting_engine_pitch_demo.mp4)
-> — 4m 16s, voiceover narration and ambient soundtrack.
+## 🎥 4-Minute Pitch Demo Video
 
----
+▶️ **[Click here to watch the full 4-minute pitch demo video](demo_video/creative_reformatting_engine_pitch_demo.mp4)** *(1080p Full HD · 20.6 MB)*
+
+> 🎬 **Demo Video File**: [**`demo_video/creative_reformatting_engine_pitch_demo.mp4`**](demo_video/creative_reformatting_engine_pitch_demo.mp4)  
+> *Engineered in high-contrast Neobrutalist motion graphics with real time-series trajectory graphs, benchmark charts, broadcast-mastered voiceover narration, and an upbeat 116 BPM tech-pop soundtrack with dynamic sidechain ducking.*
+
+### 📋 Video Chapter Index
+
+| Timestamp | Chapter & Scene | Key Concepts & Visuals Explained |
+|:---:|---|---|
+| `0:00` | **Ch 1 · Scene 1: Aspect Ratio Fragmentation** | 16:9 OTT Banner, 1:1 Social Square, 9:16 Vertical Reel, and 4:5 Mobile Portrait delivery matrix. |
+| `0:27` | **Ch 1 · Scene 2: The 3 Auto-Disqualifiers** | Overcoming naive center crops, static frame-zero reframe, and shallow dimension validators. |
+| `0:52` | **Ch 2 · Scene 1: Modular Vision Architecture** | MediaPipe BlazeFace 128-pt landmarks, SSD MobileNet person tracking, and audio VAD solver. |
+| `1:14` | **Ch 2 · Scene 2: Active Speaker Audio Sync** | Dual-axis graph of speech audio energy (VAD dB) correlated with visual lip dynamics over time. |
+| `1:34` | **Ch 3 · Scene 1: Rule-of-Thirds Composition** | Side-by-side: Naive center crop decapitating off-center actor vs CRE Subject-Aware Smart Crop. |
+| `1:58` | **Ch 3 · Scene 2: Subject Retention Benchmarks** | Coverage bar chart across ratios: 16:9 (99.4%), 1:1 (98.7%), 9:16 (97.9%), 4:5 (98.9%). |
+| `2:23` | **Ch 4 · Scene 1: Speaker-Tracking Trajectory** | XY camera trajectory plot $X(t)$ across 30s of dialogue with smooth exponential moving average pans. |
+| `2:46` | **Ch 4 · Scene 2: Peak-Sharpness Key Still** | Scanning candidate frames for peak Laplacian variance clarity (Frame 68 score 348) without blur. |
+| `3:06` | **Ch 5 · Scene 1: Platform Safe-Zone Guide** | 9:16 smartphone mock with Action Safe (14% top / 16% bottom / 5% sides) and protected UI chrome. |
+| `3:30` | **Ch 5 · Scene 2: Automated Compliance Audit** | Secondary independent inspection pass scorecard checking 18 rules before library admission. |
+| `3:52` | **Ch 6 · Scene 1: AWS Free Tier Cloud Topology** | NGINX SSL reverse proxy, EC2 Linux 2023, S3 storage, and sub-4 min GitHub Actions CI/CD. |
+| `4:14` | **Ch 6 · Scene 2: Production Verdict & Summary** | Live production workstation at `https://cre-hoichoi.aritro.cloud` and hackathon conclusion. |
 
 ## What it actually does
 
