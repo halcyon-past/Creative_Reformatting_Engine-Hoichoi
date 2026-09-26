@@ -55,7 +55,7 @@ export default function ReframeTrack({
   return (
     <div className="card space-y-2 p-4">
       <div className="flex items-baseline justify-between">
-        <h4 className="text-sm font-semibold text-white">Reframe path</h4>
+        <h4 className="text-sm font-semibold text-slate-100">Reframe path</h4>
         <span className="font-mono text-[11px] text-slate-500">
           {points.length} pts · {Math.round(travel)}px travel · {shotCuts.length} cut
           {shotCuts.length === 1 ? "" : "s"}

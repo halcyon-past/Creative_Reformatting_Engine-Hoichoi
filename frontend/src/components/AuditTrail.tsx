@@ -5,15 +5,15 @@ import { Empty, ErrorBox, Spinner } from "./common";
 import type { AuditEvent } from "../api/types";
 
 const ACTION_STYLE: Record<string, string> = {
-  "asset.uploaded": "bg-sky-500/15 text-sky-300",
+  "asset.uploaded": "bg-pop-cyan text-black",
   "asset.deleted": "bg-slate-500/15 text-slate-400",
   "job.submitted": "bg-slate-500/15 text-slate-400",
-  "job.succeeded": "bg-emerald-500/15 text-emerald-300",
-  "job.failed": "bg-rose-500/15 text-rose-300",
-  "variant.published": "bg-emerald-500/15 text-emerald-300",
-  "variant.quarantined": "bg-rose-500/15 text-rose-300",
-  "variant.regenerated": "bg-amber-500/15 text-amber-300",
-  "variant.revalidated": "bg-amber-500/15 text-amber-300",
+  "job.succeeded": "bg-pop-lime text-black",
+  "job.failed": "bg-pop-red text-white",
+  "variant.published": "bg-pop-lime text-black",
+  "variant.quarantined": "bg-pop-red text-white",
+  "variant.regenerated": "bg-pop-yellow text-black",
+  "variant.revalidated": "bg-pop-yellow text-black",
 };
 
 function Row({ event }: { event: AuditEvent }) {
@@ -51,7 +51,7 @@ function Row({ event }: { event: AuditEvent }) {
       </div>
 
       {failed.length > 0 && (
-        <p className="mt-1 text-[11px] text-rose-300">failed: {failed.join(", ")}</p>
+        <p className="mt-1 text-[11px] text-pop-red">failed: {failed.join(", ")}</p>
       )}
     </li>
   );

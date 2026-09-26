@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
-import { ErrorBox, Spinner, formatBytes } from "../components/common";
+import { ErrorBox, RatioBadge, Spinner, formatBytes } from "../components/common";
 import { UploadModal } from "../components/UploadModal";
 import type { Asset, Job } from "../api/types";
 
@@ -19,9 +19,9 @@ function AssetCard({
   const allPassed = complete && asset.published_count === asset.variant_count;
 
   return (
-    <div className="card group flex flex-col justify-between overflow-hidden border-ink-600/80 bg-ink-800 transition-all hover:border-slate-500 hover:shadow-lg">
+    <div className="group flex flex-col justify-between overflow-hidden rounded-brutal border-3 border-ink-600 bg-ink-800 shadow-brutal transition-all duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-xl">
       <Link to={`/assets/${asset.id}`} className="block">
-        <div className="checker relative aspect-video w-full overflow-hidden bg-ink-900 border-b border-ink-600/60">
+        <div className="checker relative aspect-video w-full overflow-hidden border-b-3 border-ink-600">
           {asset.thumbnail_url ? (
             <img
               src={asset.thumbnail_url}
@@ -34,11 +34,11 @@ function AssetCard({
             </div>
           )}
           <div className="absolute top-2 left-2 flex items-center gap-1.5">
-            <span className="rounded bg-black/75 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white uppercase backdrop-blur-xs border border-white/10">
+            <span className="rounded-brutal border-[2.5px] border-ink-600 bg-black px-1.5 py-0.5 font-mono text-[10px] font-extrabold uppercase text-pop-yellow shadow-brutal-sm">
               {asset.kind}
             </span>
             {asset.has_audio && (
-              <span className="rounded bg-black/75 px-1.5 py-0.5 font-mono text-[10px] text-slate-300 backdrop-blur-xs border border-white/10">
+              <span className="rounded-brutal border-[2.5px] border-ink-600 bg-pop-cyan px-1.5 py-0.5 font-mono text-[10px] font-extrabold text-black shadow-brutal-sm">
                 ♫ Audio
               </span>
             )}
@@ -56,9 +56,9 @@ function AssetCard({
                   {Math.round(activeJob.progress * 100)}%
                 </span>
               </div>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-ink-950/80 border border-ink-600/60">
+              <div className="mt-1 h-3 w-full overflow-hidden rounded-brutal border-2 border-white bg-black">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-sky-400 via-accent to-emerald-400 transition-all duration-300"
+                  className="stripes-live h-full animate-stripes transition-[width] duration-300"
                   style={{ width: `${Math.max(5, Math.round(activeJob.progress * 100))}%` }}
                 />
               </div>
@@ -71,13 +71,13 @@ function AssetCard({
         <div className="space-y-1">
           <div className="flex items-start justify-between gap-2">
             <Link to={`/assets/${asset.id}`} className="min-w-0 flex-1">
-              <h3 className="truncate text-sm font-semibold text-slate-100 hover:text-accent transition-colors">
+              <h3 className="truncate font-display text-base text-slate-100 transition-colors group-hover:text-accent">
                 {asset.title}
               </h3>
             </Link>
             <button
               onClick={() => onDelete(asset.id)}
-              className="shrink-0 text-slate-500 opacity-0 transition-opacity hover:text-rose-400 group-hover:opacity-100"
+              className="shrink-0 rounded-brutal border-[2.5px] border-ink-600 bg-ink-800 p-1 text-slate-500 shadow-brutal-sm transition-all hover:-translate-y-0.5 hover:bg-pop-red hover:text-white"
               title="Delete asset"
               aria-label={`Delete ${asset.title}`}
             >
@@ -94,25 +94,25 @@ function AssetCard({
           </p>
         </div>
 
-        <div className="flex items-center justify-between border-t border-ink-600/60 pt-2.5 text-xs">
+        <div className="flex items-center justify-between border-t-3 border-ink-600 pt-2.5 text-xs">
           <div className="flex items-center gap-1.5">
             {complete ? (
               <span
                 className={
                   allPassed
-                    ? "inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/20"
-                    : "inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium bg-amber-500/15 text-amber-300 border border-amber-500/20"
+                    ? "chip bg-pop-lime text-black"
+                    : "chip bg-pop-yellow text-black"
                 }
               >
                 <span className="font-mono font-semibold">{asset.published_count}/{asset.variant_count}</span>
                 <span>in library</span>
               </span>
             ) : asset.status === "failed" ? (
-              <span className="inline-flex items-center rounded px-1.5 py-0.5 font-medium bg-rose-500/15 text-rose-300 border border-rose-500/20">
+              <span className="inline-flex items-center rounded px-1.5 py-0.5 font-medium bg-pop-red text-white border border-rose-500/20">
                 Failed
               </span>
             ) : activeJob ? (
-              <span className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium bg-sky-500/15 text-sky-300 border border-sky-500/20">
+              <span className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium bg-pop-cyan text-black border border-sky-500/20">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-400" />
                 <span>Processing</span>
                 <span className="font-mono font-bold text-accent">
@@ -120,7 +120,7 @@ function AssetCard({
                 </span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium bg-sky-500/15 text-sky-300 border border-sky-500/20">
+              <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium bg-pop-cyan text-black border border-sky-500/20">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-400" />
                 Processing…
               </span>
@@ -212,53 +212,79 @@ export default function LibraryPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-ink-600/70 pb-5">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">Media Library</h2>
-          <p className="mt-1 text-xs text-slate-400 max-w-2xl">
-            Ingest master assets and deliver platform-ready ratios (16:9, 1:1, 9:16, 4:5) with subject-aware smart crop, key still extraction, and active-speaker tracked vertical reels.
-          </p>
-        </div>
+      {/* Page Header ----------------------------------------------------- */}
+      <div className="relative">
+        {/* Offset colour block behind the title. Pure decoration, but it stops
+            the page opening on a flat wall of cream. */}
+        <div
+          aria-hidden="true"
+          className="absolute -left-2 -top-2 h-14 w-40 -rotate-2 rounded-brutal border-3 border-ink-600 bg-pop-cyan"
+        />
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="font-display text-4xl leading-none text-slate-100">
+              MEDIA
+              <span className="ml-2 inline-block -rotate-1 rounded-brutal border-3 border-ink-600 bg-pop-yellow px-2 shadow-brutal">
+                LIBRARY
+              </span>
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm font-medium text-slate-400">
+              Ingest master assets and deliver platform-ready ratios with subject-aware
+              smart crop, key still extraction, and active-speaker tracked vertical reels.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {["16:9", "1:1", "9:16", "4:5"].map((r) => (
+                <RatioBadge key={r} ratio={r} />
+              ))}
+            </div>
+          </div>
 
-        <div className="flex items-center gap-3">
           <button
             type="button"
-            className="btn-primary flex items-center gap-2 shadow-sm"
+            className="btn-primary shrink-0 text-base"
             onClick={() => {
               setUploadError(null);
               setIsUploadOpen(true);
             }}
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <span className="text-lg leading-none">＋</span>
             <span>Ingest Master</span>
           </button>
         </div>
       </div>
 
+      <div className="h-1 w-full border-y-3 border-ink-600 stripes-warn" aria-hidden="true" />
+
       {/* KPI Stats Bar */}
       {assets.data && assets.data.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-lg border border-ink-600/80 bg-ink-800/60 p-3">
-            <span className="text-[11px] font-medium text-slate-400">Master Assets</span>
-            <p className="mt-0.5 text-lg font-bold font-mono text-white">{totalMasters}</p>
-          </div>
-          <div className="rounded-lg border border-ink-600/80 bg-ink-800/60 p-3">
-            <span className="text-[11px] font-medium text-slate-400">Rendered Variants</span>
-            <p className="mt-0.5 text-lg font-bold font-mono text-white">{totalVariants}</p>
-          </div>
-          <div className="rounded-lg border border-ink-600/80 bg-ink-800/60 p-3">
-            <span className="text-[11px] font-medium text-slate-400">Published in Library</span>
-            <p className="mt-0.5 text-lg font-bold font-mono text-emerald-400">{totalPublished}</p>
-          </div>
-          <div className="rounded-lg border border-ink-600/80 bg-ink-800/60 p-3">
-            <span className="text-[11px] font-medium text-slate-400">Compliance Rate</span>
-            <p className="mt-0.5 text-lg font-bold font-mono text-accent">
-              {totalVariants > 0 ? `${Math.round((totalPublished / totalVariants) * 100)}%` : "—"}
-            </p>
-          </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {(
+            [
+              { label: "Master Assets", value: totalMasters, bg: "bg-pop-cyan", tilt: "-rotate-1" },
+              { label: "Rendered Variants", value: totalVariants, bg: "bg-pop-purple", tilt: "rotate-1" },
+              { label: "Published", value: totalPublished, bg: "bg-pop-lime", tilt: "-rotate-1" },
+              {
+                label: "Compliance",
+                value:
+                  totalVariants > 0
+                    ? `${Math.round((totalPublished / totalVariants) * 100)}%`
+                    : "—",
+                bg: "bg-pop-yellow",
+                tilt: "rotate-1",
+              },
+            ] as const
+          ).map((kpi) => (
+            <div
+              key={kpi.label}
+              className={`${kpi.tilt} rounded-brutal border-3 border-ink-600 ${kpi.bg} p-3 shadow-brutal
+                          transition-transform duration-150 hover:rotate-0 hover:scale-[1.03]`}
+            >
+              <span className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-black/70">
+                {kpi.label}
+              </span>
+              <p className="font-display text-3xl leading-tight text-black">{kpi.value}</p>
+            </div>
+          ))}
         </div>
       )}
 
@@ -273,9 +299,9 @@ export default function LibraryPage() {
             setUploadError(null);
             setIsUploadOpen(true);
           }}
-          className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-ink-600 bg-ink-800/40 p-12 text-center cursor-pointer transition hover:border-slate-500 hover:bg-ink-800/70"
+          className="flex flex-col items-center justify-center rounded-brutal border-2 border-dashed border-ink-600 bg-ink-800 p-12 text-center cursor-pointer transition hover:border-slate-500 hover:bg-ink-800"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-700 text-accent mb-4 border border-ink-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-700 text-accent mb-4 border-[2.5px] border-ink-600">
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>

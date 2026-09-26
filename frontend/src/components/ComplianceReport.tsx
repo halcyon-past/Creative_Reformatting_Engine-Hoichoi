@@ -57,8 +57,8 @@ export default function ComplianceReportView({ report }: { report: Report }) {
         <span
           className={
             report.verdict === "pass"
-              ? "chip bg-emerald-500/15 text-emerald-300"
-              : "chip bg-rose-500/15 text-rose-300"
+              ? "chip bg-pop-lime text-black"
+              : "chip bg-pop-red text-white"
           }
         >
           {report.verdict.toUpperCase()}
@@ -78,7 +78,7 @@ export default function ComplianceReportView({ report }: { report: Report }) {
         </p>
       )}
 
-      <ul className="card divide-y divide-ink-700 px-3">
+      <ul className="card divide-y divide-ink-600 px-3">
         {sorted.map((result) => (
           <Rule key={result.rule_id} result={result} />
         ))}

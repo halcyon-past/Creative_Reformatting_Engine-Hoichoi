@@ -67,15 +67,15 @@ export function ReformatModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="reformat-dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/80 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-[2px]"
     >
       <div
-        className="w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-xl border border-ink-600 bg-ink-800 shadow-2xl transition-all"
+        className="w-full max-w-2xl max-h-[92vh] overflow-y-auto animate-pop-in rounded-brutal border-5 border-ink-600 bg-ink-800 shadow-brutal-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-ink-600/80 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-ink-600 px-6 py-4">
           <div>
-            <h2 id="reformat-dialog-title" className="text-base font-semibold text-white">
+            <h2 id="reformat-dialog-title" className="text-base font-semibold text-slate-100">
               Choose Ratios to Render
             </h2>
             <p className="text-xs text-slate-400">
@@ -86,7 +86,7 @@ export function ReformatModal({
             type="button"
             onClick={onClose}
             disabled={isProcessing}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-ink-700 hover:text-white transition disabled:opacity-40"
+            className="rounded-brutal p-1.5 text-slate-400 hover:bg-ink-700 hover:text-slate-100 transition disabled:opacity-40"
             aria-label="Close dialog"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -104,7 +104,7 @@ export function ReformatModal({
           />
         </div>
 
-        <div className="flex items-center justify-between border-t border-ink-600/80 px-6 py-4 bg-ink-900/40">
+        <div className="flex items-center justify-between border-t border-ink-600 px-6 py-4 bg-ink-900">
           <button
             type="button"
             onClick={onClose}

@@ -86,28 +86,28 @@ function RatioSilhouette({ ratio }: { ratio: string }) {
   switch (ratio) {
     case "16:9":
       return (
-        <div className="relative flex h-8 w-14 items-center justify-center rounded border border-slate-600 bg-ink-900/90 shadow-inner">
+        <div className="relative flex h-8 w-14 items-center justify-center rounded border border-slate-600 bg-ink-900 shadow-inner">
           <div className="h-6 w-11 rounded-sm border border-dashed border-accent/40" />
           <span className="absolute text-[9px] font-mono text-slate-300">16:9</span>
         </div>
       );
     case "1:1":
       return (
-        <div className="relative flex h-9 w-9 items-center justify-center rounded border border-slate-600 bg-ink-900/90 shadow-inner">
+        <div className="relative flex h-9 w-9 items-center justify-center rounded border border-slate-600 bg-ink-900 shadow-inner">
           <div className="h-7 w-7 rounded-sm border border-dashed border-accent/40" />
           <span className="absolute text-[9px] font-mono text-slate-300">1:1</span>
         </div>
       );
     case "9:16":
       return (
-        <div className="relative flex h-11 w-7 items-center justify-center rounded border border-slate-600 bg-ink-900/90 shadow-inner">
+        <div className="relative flex h-11 w-7 items-center justify-center rounded border border-slate-600 bg-ink-900 shadow-inner">
           <div className="h-8 w-5 rounded-sm border border-dashed border-accent/40" />
           <span className="absolute text-[8px] font-mono text-slate-300">9:16</span>
         </div>
       );
     case "4:5":
       return (
-        <div className="relative flex h-10 w-8 items-center justify-center rounded border border-slate-600 bg-ink-900/90 shadow-inner">
+        <div className="relative flex h-10 w-8 items-center justify-center rounded border border-slate-600 bg-ink-900 shadow-inner">
           <div className="h-8 w-6 rounded-sm border border-dashed border-accent/40" />
           <span className="absolute text-[8px] font-mono text-slate-300">4:5</span>
         </div>
@@ -189,10 +189,10 @@ export function RatioSelector({
                 }
               }}
               className={clsx(
-                "group relative flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-left transition-all select-none",
+                "group relative flex cursor-pointer items-start gap-3 rounded-brutal border p-3 text-left transition-all select-none",
                 isSelected
-                  ? "border-accent bg-ink-700/80 ring-1 ring-accent/30 shadow-sm"
-                  : "border-ink-600 bg-ink-800/80 hover:border-slate-500 hover:bg-ink-700/40",
+                  ? "border-accent bg-ink-700 ring-1 ring-accent/30 shadow-brutal-sm"
+                  : "border-ink-600 bg-ink-800 hover:border-slate-500 hover:bg-ink-700",
               )}
             >
               <div className="shrink-0 pt-0.5">
@@ -204,7 +204,7 @@ export function RatioSelector({
                   <span className="truncate text-xs font-semibold text-slate-100">
                     {option.label}
                   </span>
-                  <span className="shrink-0 rounded bg-ink-900 px-1.5 py-0.5 font-mono text-[10px] text-slate-400 border border-ink-600">
+                  <span className="shrink-0 rounded bg-ink-900 px-1.5 py-0.5 font-mono text-[10px] text-slate-400 border-[2.5px] border-ink-600">
                     {option.width}×{option.height}
                   </span>
                 </div>
@@ -222,8 +222,8 @@ export function RatioSelector({
                       className={clsx(
                         "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium",
                         existing.inLibrary
-                          ? "bg-emerald-500/15 text-emerald-300"
-                          : "bg-rose-500/15 text-rose-300",
+                          ? "bg-pop-lime text-black"
+                          : "bg-pop-red text-white",
                       )}
                     >
                       {existing.inLibrary ? "Already in Library" : "Quarantined / Failed"}

@@ -103,16 +103,16 @@ export function UploadModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="upload-dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/80 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-[2px]"
     >
       <div
-        className="w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-xl border border-ink-600 bg-ink-800 shadow-2xl transition-all"
+        className="w-full max-w-2xl max-h-[92vh] overflow-y-auto animate-pop-in rounded-brutal border-5 border-ink-600 bg-ink-800 shadow-brutal-xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-ink-600/80 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-ink-600 px-6 py-4">
           <div>
-            <h2 id="upload-dialog-title" className="text-base font-semibold text-white">
+            <h2 id="upload-dialog-title" className="text-base font-semibold text-slate-100">
               Ingest Master & Configure Delivery
             </h2>
             <p className="text-xs text-slate-400">
@@ -123,7 +123,7 @@ export function UploadModal({
             type="button"
             onClick={onClose}
             disabled={isUploading}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-ink-700 hover:text-white transition disabled:opacity-40"
+            className="rounded-brutal p-1.5 text-slate-400 hover:bg-ink-700 hover:text-slate-100 transition disabled:opacity-40"
             aria-label="Close dialog"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -145,10 +145,10 @@ export function UploadModal({
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={clsx(
-                "flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors",
+                "flex flex-col items-center justify-center rounded-brutal border-2 border-dashed p-8 text-center cursor-pointer transition-colors",
                 isDragOver
                   ? "border-accent bg-accent/5"
-                  : "border-slate-700 bg-ink-900/50 hover:border-slate-500 hover:bg-ink-900/80",
+                  : "border-slate-700 bg-ink-900 hover:border-slate-500 hover:bg-ink-900",
               )}
             >
               <input
@@ -158,7 +158,7 @@ export function UploadModal({
                 className="hidden"
                 onChange={handleFileChange}
               />
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-700 text-accent mb-3 border border-ink-600">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-700 text-accent mb-3 border-[2.5px] border-ink-600">
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
@@ -179,8 +179,8 @@ export function UploadModal({
             /* Selected File Inspection & Settings */
             <div className="space-y-5">
               {/* Media File Card */}
-              <div className="flex items-center gap-4 rounded-lg border border-ink-600 bg-ink-900/90 p-3">
-                <div className="checker relative flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded border border-ink-600 bg-black">
+              <div className="flex items-center gap-4 rounded-brutal border-[2.5px] border-ink-600 bg-ink-900 p-3">
+                <div className="checker relative flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded border-[2.5px] border-ink-600 bg-black">
                   {filePreview && (
                     mediaKind === "video" ? (
                       <video
@@ -211,7 +211,7 @@ export function UploadModal({
                       type="button"
                       disabled={isUploading}
                       onClick={() => setFile(null)}
-                      className="text-xs text-rose-400 hover:text-rose-300 transition"
+                      className="text-xs text-pop-red hover:text-pop-red transition"
                     >
                       Change
                     </button>
@@ -233,12 +233,12 @@ export function UploadModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Mismatched Episode 01 Banner"
-                  className="w-full rounded-lg border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full rounded-brutal border-[2.5px] border-ink-600 bg-ink-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
 
               {/* Ratio Selector */}
-              <div className="border-t border-ink-600/70 pt-4">
+              <div className="border-t border-ink-600 pt-4">
                 <RatioSelector
                   mediaKind={mediaKind}
                   selectedIds={selectedProfileIds}
@@ -250,7 +250,7 @@ export function UploadModal({
 
           {/* Upload & Progress State */}
           {isUploading && (
-            <div className="space-y-2 rounded-lg border border-accent/30 bg-accent/5 p-4">
+            <div className="space-y-2 rounded-brutal border border-accent/30 bg-accent/5 p-4">
               <div className="flex items-center justify-between text-xs text-slate-300">
                 <span className="flex items-center gap-2 font-medium">
                   <span className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -273,7 +273,7 @@ export function UploadModal({
         </div>
 
         {/* Modal Footer Actions */}
-        <div className="flex items-center justify-between border-t border-ink-600/80 px-6 py-4 bg-ink-900/40">
+        <div className="flex items-center justify-between border-t border-ink-600 px-6 py-4 bg-ink-900">
           <button
             type="button"
             onClick={onClose}

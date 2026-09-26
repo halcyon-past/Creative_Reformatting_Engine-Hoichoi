@@ -2,39 +2,174 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================================================
+   NEOBRUTALISM
+   Black edges on everything. Shadows are offsets, never blurs. Colour is
+   flat and loud. Interactive things move when you press them, because a
+   button that doesn't move doesn't feel like a button.
+   ===================================================================== */
+
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-ink-900 text-slate-200 antialiased;
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+
+    /* Dot grid. Gives the paper some tooth so cards read as sitting *on* it. */
+    background-image: radial-gradient(#00000014 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
+  }
+
+  ::selection {
+    @apply bg-pop-yellow text-black;
+  }
+
+  h1, h2, h3 {
+    font-family: "Archivo Black", "Space Grotesk", Impact, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Chunky scrollbars, because a 4px hairline would be off-language. */
+  ::-webkit-scrollbar { width: 14px; height: 14px; }
+  ::-webkit-scrollbar-track { @apply bg-ink-950; border-left: 3px solid #000; }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-accent;
+    border: 3px solid #000;
+  }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-pop-yellow; }
+
+  /* Keyboard users get the same loud treatment as everyone else. */
+  :focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 3px;
   }
 }
 
 @layer components {
+  /* ---- surfaces ------------------------------------------------------ */
   .card {
-    @apply rounded-lg border border-ink-600 bg-ink-800;
+    @apply rounded-brutal border-3 border-ink-600 bg-ink-800 shadow-brutal;
   }
+
+  /* Lifts toward you on hover. Used for anything clickable that isn't a button. */
+  .card-hover {
+    @apply card transition-all duration-150
+           hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg;
+  }
+
+  .well {
+    @apply rounded-brutal border-3 border-ink-600 bg-ink-950 shadow-brutal-inner;
+  }
+
+  /* ---- buttons ------------------------------------------------------- */
+  /* The press effect: shadow collapses and the element slides into it, so
+     the button physically travels the 3px it appeared to be raised by. */
   .btn {
-    @apply inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium
-           transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-brutal
+           border-3 border-ink-600 px-4 py-2
+           text-sm font-bold uppercase tracking-wide
+           shadow-brutal transition-all duration-100
+           hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lg
+           active:translate-x-[3px] active:translate-y-[3px] active:shadow-brutal-press
+           disabled:pointer-events-none disabled:opacity-50
+           disabled:shadow-brutal-sm disabled:translate-x-0 disabled:translate-y-0;
   }
-  .btn-primary {
-    @apply btn bg-accent/90 text-ink-900 hover:bg-accent;
-  }
-  .btn-ghost {
-    @apply btn border border-ink-600 text-slate-300 hover:bg-ink-700;
-  }
+  .btn-primary  { @apply btn bg-accent text-white; }
+  .btn-ghost    { @apply btn bg-ink-800 text-slate-200 hover:bg-ink-700; }
+  .btn-yellow   { @apply btn bg-pop-yellow text-black; }
+  .btn-cyan     { @apply btn bg-pop-cyan text-black; }
+  .btn-lime     { @apply btn bg-pop-lime text-black; }
+  .btn-danger   { @apply btn bg-pop-red text-white; }
+  .btn-sm       { @apply px-2.5 py-1 text-xs border-[2.5px]; }
+
+  /* ---- chips / stickers ---------------------------------------------- */
   .chip {
-    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold;
+    @apply inline-flex items-center gap-1 rounded-brutal border-[2.5px] border-ink-600
+           px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide
+           shadow-brutal-sm;
+  }
+
+  /* Rotated like something stuck on by hand. */
+  .sticker {
+    @apply chip -rotate-2 shadow-brutal;
+  }
+
+  .tab {
+    @apply rounded-brutal border-3 border-ink-600 px-3 py-1.5
+           text-xs font-extrabold uppercase tracking-wider
+           transition-all duration-100
+           hover:-translate-y-0.5 hover:shadow-brutal;
+  }
+  .tab-active   { @apply tab bg-accent text-white shadow-brutal; }
+  .tab-inactive { @apply tab bg-ink-800 text-slate-400 shadow-brutal-sm hover:bg-pop-yellow hover:text-black; }
+
+  /* ---- inputs -------------------------------------------------------- */
+  .input {
+    @apply w-full rounded-brutal border-3 border-ink-600 bg-ink-800 px-3 py-2
+           text-sm font-medium text-slate-200 shadow-brutal-inner
+           placeholder:text-slate-500
+           focus:outline-none focus:ring-0 focus:border-accent;
+  }
+
+  /* ---- section heading ----------------------------------------------- */
+  .label {
+    @apply inline-block border-3 border-ink-600 bg-black px-2 py-0.5
+           text-[11px] font-extrabold uppercase tracking-[0.12em] text-pop-yellow;
   }
 }
 
-/* The checkerboard makes letterboxing in a variant obvious at a glance. */
+@layer utilities {
+  .text-stroke {
+    -webkit-text-stroke: 2px #000;
+    paint-order: stroke fill;
+  }
+
+  /* Diagonal hazard stripes — used for quarantined / in-progress states. */
+  .stripes-warn {
+    background-image: repeating-linear-gradient(
+      45deg, #FFD93D 0 10px, #000 10px 20px
+    );
+  }
+  .stripes-danger {
+    background-image: repeating-linear-gradient(
+      45deg, #FF5252 0 10px, #000 10px 20px
+    );
+  }
+  .stripes-live {
+    background-image: repeating-linear-gradient(
+      45deg, #A3E635 0 10px, #000 10px 20px
+    );
+    background-size: 28px 28px;
+  }
+
+  .halftone {
+    background-image: radial-gradient(#00000022 1.5px, transparent 1.5px);
+    background-size: 8px 8px;
+  }
+}
+
+/* Checkerboard behind media. Letterboxing in a variant is obvious against it,
+   which is the entire reason it exists. */
 .checker {
+  background-color: #fff;
   background-image:
-    linear-gradient(45deg, #1b2333 25%, transparent 25%),
-    linear-gradient(-45deg, #1b2333 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #1b2333 75%),
-    linear-gradient(-45deg, transparent 75%, #1b2333 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    linear-gradient(45deg, #E7E0D0 25%, transparent 25%),
+    linear-gradient(-45deg, #E7E0D0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #E7E0D0 75%),
+    linear-gradient(-45deg, transparent 75%, #E7E0D0 75%);
+  background-size: 18px 18px;
+  background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+}
+
+/* Respect people who asked the OS to calm things down. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

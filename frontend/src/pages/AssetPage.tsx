@@ -104,14 +104,14 @@ function InspectorPreview({
     <div className="flex flex-col items-center">
       {/* Platform & Frame Resolution Badge */}
       <div className="mb-3.5 flex items-center gap-2">
-        <div className="flex items-center gap-2 rounded-full border border-ink-600/90 bg-ink-800/95 px-3.5 py-1 text-[11px] font-mono text-slate-200 shadow-sm backdrop-blur-xs">
+        <div className="flex items-center gap-2 rounded-full border-[2.5px] border-ink-600 bg-ink-800 px-3.5 py-1 text-[11px] font-mono text-slate-200 shadow-brutal-sm backdrop-blur-xs">
           <span
             className={clsx(
               "h-2 w-2 rounded-full",
               isVertical ? "bg-emerald-400 animate-pulse" : "bg-accent"
             )}
           />
-          <span className="font-semibold text-white">
+          <span className="font-semibold text-slate-100">
             {isVertical
               ? "Smartphone Reel Frame (9:16)"
               : isSquare
@@ -134,17 +134,17 @@ function InspectorPreview({
       {/* Aspect-Locked Viewport Stage */}
       <div
         className={clsx(
-          "relative overflow-hidden shadow-2xl bg-black transition-all",
+          "relative overflow-hidden shadow-brutal-xl bg-black transition-all",
           isVertical &&
             "h-[560px] max-h-[72vh] aspect-[9/16] rounded-[32px] border-[6px] border-slate-700 ring-1 ring-white/10",
           isSquare &&
-            "h-[420px] max-h-[65vh] aspect-square rounded-xl border-2 border-slate-700 ring-1 ring-white/10",
+            "h-[420px] max-h-[65vh] aspect-square rounded-brutal border-2 border-slate-700 ring-1 ring-white/10",
           isPortrait &&
-            "h-[490px] max-h-[70vh] aspect-[4/5] rounded-xl border-2 border-slate-700 ring-1 ring-white/10",
+            "h-[490px] max-h-[70vh] aspect-[4/5] rounded-brutal border-2 border-slate-700 ring-1 ring-white/10",
           !isVertical &&
             !isSquare &&
             !isPortrait &&
-            "w-full max-w-3xl aspect-video rounded-xl border-2 border-slate-700 ring-1 ring-white/10"
+            "w-full max-w-3xl aspect-video rounded-brutal border-2 border-slate-700 ring-1 ring-white/10"
         )}
       >
         {variant.kind === "video" ? (
@@ -193,8 +193,8 @@ function VariantCard({
       className={clsx(
         "card flex flex-col justify-between overflow-hidden transition-all",
         selected
-          ? "border-accent ring-1 ring-accent/40 shadow-md bg-ink-800"
-          : "border-ink-600/80 hover:border-slate-500 bg-ink-800/90",
+          ? "border-accent ring-1 ring-accent/40 shadow-brutal bg-ink-800"
+          : "border-ink-600 hover:border-slate-500 bg-ink-800",
         !variant.in_library && "border-rose-500/40",
       )}
     >
@@ -203,7 +203,7 @@ function VariantCard({
         onClick={onSelect}
         className="block w-full text-left focus:outline-none"
       >
-        <div className="checker relative flex h-60 items-center justify-center bg-ink-900 border-b border-ink-600/60">
+        <div className="checker relative flex h-60 items-center justify-center bg-ink-900 border-b border-ink-600">
           <VariantCardPreview variant={variant} />
           <div className="absolute top-2 left-2 flex items-center gap-1.5">
             <RatioBadge ratio={variant.ratio_label} />
@@ -228,17 +228,17 @@ function VariantCard({
         </p>
 
         {!variant.in_library && (
-          <p className="text-xs text-rose-300">
+          <p className="text-xs text-pop-red">
             {variant.error ?? "Quarantined: held out of library"}
           </p>
         )}
         {variant.warning_count > 0 && variant.in_library && (
-          <p className="text-xs text-amber-300">
+          <p className="text-xs text-yellow-700">
             {variant.warning_count} warning{variant.warning_count > 1 ? "s" : ""}
           </p>
         )}
 
-        <div className="flex gap-2 pt-1 border-t border-ink-600/60">
+        <div className="flex gap-2 pt-1 border-t border-ink-600">
           <button
             type="button"
             className={clsx(
@@ -366,7 +366,7 @@ export default function AssetPage() {
   return (
     <div className="space-y-6">
       {/* Asset Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-ink-600/70 pb-5">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-ink-600 pb-5">
         <div>
           <Link
             to="/"
@@ -375,8 +375,8 @@ export default function AssetPage() {
             ← Back to Library
           </Link>
           <div className="mt-2 flex items-center gap-3">
-            <h2 className="text-xl font-bold tracking-tight text-white">{a.title}</h2>
-            <span className="rounded bg-ink-700 px-2 py-0.5 font-mono text-xs text-slate-300 border border-ink-600">
+            <h2 className="font-display text-3xl leading-none text-slate-100">{a.title}</h2>
+            <span className="rounded bg-ink-700 px-2 py-0.5 font-mono text-xs text-slate-300 border-[2.5px] border-ink-600">
               {a.kind.toUpperCase()}
             </span>
           </div>
@@ -400,9 +400,9 @@ export default function AssetPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="rounded-lg border border-ink-600/80 bg-ink-800/80 px-3 py-1.5 text-xs text-slate-300">
+          <div className="rounded-brutal border-[2.5px] border-ink-600 bg-ink-800 px-3 py-1.5 text-xs text-slate-300">
             Library status:{" "}
-            <span className="font-mono font-semibold text-white">
+            <span className="font-mono font-semibold text-slate-100">
               {published}/{variants.data?.length ?? 0}
             </span>{" "}
             published
@@ -431,7 +431,7 @@ export default function AssetPage() {
 
       {/* Unrendered Ratios Notice */}
       {unrenderedProfiles.length > 0 && !activeJob && (
-        <div className="flex items-center justify-between rounded-lg border border-accent/30 bg-accent/5 px-4 py-3">
+        <div className="flex items-center justify-between rounded-brutal border border-accent/30 bg-accent/5 px-4 py-3">
           <div className="space-y-0.5">
             <p className="text-xs font-semibold text-slate-200">
               Unrendered ratios available ({unrenderedProfiles.length}):
@@ -452,34 +452,34 @@ export default function AssetPage() {
 
       {/* Active Pipeline Progress */}
       {activeJob && (
-        <div className="card space-y-3 p-5 border-accent/50 bg-gradient-to-br from-ink-800 to-ink-900 shadow-xl ring-1 ring-accent/30">
+        <div className="animate-pop-in space-y-3 rounded-brutal border-3 border-ink-600 bg-pop-yellow p-5 shadow-brutal-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="relative flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-accent" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-60" />
+                <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-ink-600 bg-pop-red" />
               </span>
               <div>
-                <span className="text-sm font-semibold text-white">
+                <span className="font-display text-base text-black">
                   {formatStageName(activeJob.stage)}
                 </span>
-                <p className="text-[11px] font-mono text-slate-400">
+                <p className="font-mono text-[11px] font-bold text-black/70">
                   Job ID: {activeJob.id.slice(0, 8)} · Type: {activeJob.type} · Status: {activeJob.status}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="rounded-lg border border-accent/40 bg-accent/15 px-3 py-1 font-mono text-base font-bold text-accent shadow-sm">
+              <span className="rounded-brutal border border-accent/40 bg-accent px-3 py-1 font-mono text-base font-bold text-accent shadow-brutal-sm">
                 {Math.round((activeJob.progress ?? 0) * 100)}%
               </span>
             </div>
           </div>
 
           {/* Granular Animated Progress Bar */}
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-ink-950 border border-ink-600/80 shadow-inner">
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-ink-950 border-[2.5px] border-ink-600 shadow-inner">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-400 via-accent to-emerald-400 transition-all duration-300 shadow-md"
+              className="h-full rounded-full bg-gradient-to-r from-sky-400 via-accent to-emerald-400 transition-all duration-300 shadow-brutal"
               style={{ width: `${Math.max(4, Math.round((activeJob.progress ?? 0) * 100))}%` }}
             />
           </div>
@@ -498,7 +498,7 @@ export default function AssetPage() {
       {/* Variants Gallery */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h3 className="label">
             Derived Platform Variants ({variants.data?.length ?? 0})
           </h3>
           <span className="text-xs text-slate-500">
@@ -532,13 +532,13 @@ export default function AssetPage() {
 
       {/* Selected Variant Inspector */}
       {selected && (
-        <div className="space-y-6 border-t border-ink-600/70 pt-6">
+        <div className="space-y-6 border-t-3 border-ink-600 pt-6">
           {/* Inspector Header with Safe-Zone Toggles */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <RatioBadge ratio={selected.ratio_label} />
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="font-display text-xl text-slate-100">
                   Inspector: {selected.profile_label ?? selected.profile_id}
                 </h3>
               </div>
@@ -548,7 +548,7 @@ export default function AssetPage() {
             </div>
 
             {/* Overlays Control Toolbar */}
-            <div className="flex items-center gap-2 rounded-lg border border-ink-600/80 bg-ink-800 p-1">
+            <div className="flex items-center gap-2 rounded-brutal border-[2.5px] border-ink-600 bg-ink-800 p-1">
               <span className="px-2 text-xs font-medium text-slate-400">Overlays:</span>
               <button
                 type="button"
@@ -556,8 +556,8 @@ export default function AssetPage() {
                 className={clsx(
                   "rounded px-2.5 py-1 text-xs font-medium transition",
                   showSafeZones
-                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                    : "text-slate-400 hover:text-white",
+                    ? "bg-pop-lime text-black border border-emerald-500/30"
+                    : "text-slate-400 hover:text-slate-100",
                 )}
               >
                 Safe Zones
@@ -569,8 +569,8 @@ export default function AssetPage() {
                   className={clsx(
                     "rounded px-2.5 py-1 text-xs font-medium transition",
                     showPlatformChrome
-                      ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                      : "text-slate-400 hover:text-white",
+                      ? "bg-pop-red text-white border border-rose-500/30"
+                      : "text-slate-400 hover:text-slate-100",
                   )}
                 >
                   Platform UI Chrome
@@ -580,7 +580,7 @@ export default function AssetPage() {
           </div>
 
           {/* Workstation Inspection Stage with Device Mockup */}
-          <div className="checker relative flex min-h-[580px] w-full items-center justify-center overflow-hidden rounded-xl border border-ink-600 bg-ink-950/90 p-4 sm:p-8 shadow-inner">
+          <div className="checker relative flex min-h-[580px] w-full items-center justify-center overflow-hidden rounded-brutal border-[2.5px] border-ink-600 bg-ink-950 p-4 sm:p-8 shadow-inner">
             <InspectorPreview
               variant={selected}
               showSafeZones={showSafeZones}
@@ -593,9 +593,7 @@ export default function AssetPage() {
             {/* Left: Why this crop & Reframe Track */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                  Crop Decision & Framing Strategy
-                </h4>
+                <h4 className="label">Crop Decision &amp; Framing Strategy</h4>
                 {selected.crop_decision && (
                   <span className="font-mono text-xs text-accent">
                     {selected.crop_decision.strategy}
@@ -605,16 +603,16 @@ export default function AssetPage() {
 
               {selected.crop_decision ? (
                 <div className="card space-y-3 p-4">
-                  <div className="grid grid-cols-3 gap-2 border-b border-ink-600/60 pb-3 text-center">
+                  <div className="grid grid-cols-3 gap-2 border-b-3 border-ink-600 pb-3 text-center">
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase">Subject Coverage</span>
-                      <p className="font-mono text-sm font-bold text-white">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500">Subject Coverage</span>
+                      <p className="font-display text-xl text-slate-100">
                         {(selected.crop_decision.subject_coverage * 100).toFixed(1)}%
                       </p>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase">Faces Preserved</span>
-                      <p className="font-mono text-sm font-bold text-emerald-400">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wide text-slate-500">Faces Preserved</span>
+                      <p className="font-mono text-sm font-bold text-green-700">
                         {selected.crop_decision.faces_fully_inside}/{selected.crop_decision.faces_considered}
                       </p>
                     </div>
@@ -623,7 +621,7 @@ export default function AssetPage() {
                       <p
                         className={clsx(
                           "font-mono text-sm font-bold",
-                          selected.crop_decision.faces_clipped ? "text-rose-400" : "text-slate-300",
+                          selected.crop_decision.faces_clipped ? "text-pop-red" : "text-slate-300",
                         )}
                       >
                         {selected.crop_decision.faces_clipped}
@@ -663,9 +661,7 @@ export default function AssetPage() {
 
             {/* Right: Spec Compliance Report & Audit Trail */}
             <section className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                Compliance Verification & Audit
-              </h4>
+              <h4 className="label">Compliance Verification &amp; Audit</h4>
 
               {report.isLoading && <Spinner label="Loading compliance report…" />}
               {report.data ? (

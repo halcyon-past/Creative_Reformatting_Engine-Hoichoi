@@ -28,7 +28,7 @@ export function SafeZoneOverlay({
               right: isVertical ? "5%" : "4%",
             }}
           >
-            <span className="absolute top-1 left-1.5 rounded bg-emerald-950/80 px-1 py-0.5 font-mono text-[9px] font-medium text-emerald-300 backdrop-blur-xs">
+            <span className="absolute top-1 left-1.5 rounded bg-emerald-950/80 px-1 py-0.5 font-mono text-[9px] font-medium text-green-700 backdrop-blur-xs">
               Action Safe
             </span>
           </div>
@@ -70,7 +70,7 @@ export function SafeZoneOverlay({
               </div>
               <span className="text-[10px] font-semibold tracking-wide">hoichoi.tv</span>
             </div>
-            <span className="rounded bg-rose-500/80 px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider shadow-sm">
+            <span className="rounded bg-rose-500/80 px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider shadow-brutal-sm">
               Protected Chrome
             </span>
           </div>
