@@ -30,9 +30,9 @@ automated compliance report against a machine-readable spec sheet.**
 
 ## 🎥 4-Minute Pitch Demo Video
 
-[![Creative Reformatting Engine Pitch Demo Video](demo_video/slides/ch1_scene1.png)](demo_video/creative_reformatting_engine_pitch_demo.mp4)
+▶️ **[Click here to watch the full 4-minute pitch demo video](demo_video/creative_reformatting_engine_pitch_demo.mp4)** *(1080p Full HD · 20.6 MB)*
 
-> 🎬 **Watch the full pitch video**: [**`demo_video/creative_reformatting_engine_pitch_demo.mp4`**](demo_video/creative_reformatting_engine_pitch_demo.mp4) (4m 20s · 1080p Full HD)  
+> 🎬 **Demo Video File**: [**`demo_video/creative_reformatting_engine_pitch_demo.mp4`**](demo_video/creative_reformatting_engine_pitch_demo.mp4)  
 > *Engineered in high-contrast Neobrutalist motion graphics with real time-series trajectory graphs, benchmark charts, broadcast-mastered voiceover narration, and an upbeat 116 BPM tech-pop soundtrack with dynamic sidechain ducking.*
 
 ### 📋 Video Chapter Index

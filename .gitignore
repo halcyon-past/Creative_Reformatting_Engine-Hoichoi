@@ -6,12 +6,10 @@ diagnostics/
 !data/.gitkeep
 test_sample/*
 !test_sample/.gitkeep
-# demo video scratch / temp build artifacts
-demo_video/*.aiff
-demo_video/*.wav
-demo_video/*_segment.mp4
-demo_video/video_narration_only.mp4
-demo_video/concat_list.txt
+# demo video: keep ONLY the pitch demo mp4
+demo_video/*
+!demo_video/creative_reformatting_engine_pitch_demo.mp4
+
 
 # python
 .venv/
