@@ -151,16 +151,27 @@ jobs:
 
       - name: Verify Live Health
         run: |
-          APP_URL="${{ secrets.CRE_APP_URL || 'http://100.28.92.125' }}"
-          echo "Verifying application health at: $APP_URL/health"
+          APP_URL="${{ secrets.CRE_APP_URL || 'https://cre-hoichoi.aritro.cloud' }}"
+          echo "Verifying application health..."
+          HEALTHY=false
           for i in {1..15}; do
-            if curl -s -f "$APP_URL/health"; then
+            if curl -s -f "http://100.28.92.125/health"; then
               echo ""
-              echo "=== Application is healthy and serving requests! ==="
-              exit 0
+              echo "=== Application containers verified healthy on EC2! ==="
+              HEALTHY=true
+              break
             fi
             echo "Waiting for app to start... ($i/15)"
             sleep 4
           done
-          echo "Health check failed or timed out!"
-          exit 1
+
+          if [ "$HEALTHY" != "true" ]; then
+            echo "Health check failed on EC2 instance!"
+            exit 1
+          fi
+
+          if curl -s -f "$APP_URL/health" --max-time 5 2>/dev/null; then
+            echo "=== Custom domain $APP_URL verified live! ==="
+          else
+            echo "Note: $APP_URL may still be pending DNS propagation."
+          fi
