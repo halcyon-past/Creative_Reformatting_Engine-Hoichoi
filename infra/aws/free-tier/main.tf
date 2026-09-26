@@ -142,6 +142,14 @@ resource "aws_security_group" "app" {
     cidr_blocks = var.allowed_web_cidrs
   }
 
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_web_cidrs
+  }
+
   # SSH is opt-in and CIDR-scoped. Leave `ssh_cidrs` empty and use SSM Session
   # Manager instead -- the instance profile below already permits it, and it
   # avoids exposing port 22 at all.
