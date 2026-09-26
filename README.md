@@ -11,7 +11,7 @@
 [![Tests](https://img.shields.io/badge/tests-102%20passing-22c55e?style=flat-square)](#testing)
 
 [**Live demo**](https://cre-hoichoi.aritro.cloud) ·
-[![Pitch Demo Thumbnail](demo_video/thumbnail.png)](https://drive.google.com/file/d/1vmCmVuZ7MvNpbe7scaPS9jE-4KTVcerq/view?usp=sharing) ·
+[**Pitch video**](https://drive.google.com/file/d/1vmCmVuZ7MvNpbe7scaPS9jE-4KTVcerq/view?usp=sharing) ·
 [**Architecture**](docs/ARCHITECTURE.md) ·
 [**Audit**](docs/AUDIT.md) ·
 [**Free tier**](docs/FREE_TIER.md)
@@ -30,9 +30,10 @@ automated compliance report against a machine-readable spec sheet.**
 
 ## 🎥 4-Minute Pitch Demo Video
 
-▶️ **[Watch the full pitch demo video on Google Drive](https://drive.google.com/file/d/1vmCmVuZ7MvNpbe7scaPS9jE-4KTVcerq/view?usp=sharing)** *(1080p Full HD · 20.6 MB, hosted on Google Drive)*
+[![Watch the 4-minute pitch demo video](demo_video/thumbnail.png)](https://drive.google.com/file/d/1vmCmVuZ7MvNpbe7scaPS9jE-4KTVcerq/view?usp=sharing)
 
-> *Engineered in high‑contrast Neobrutalist motion graphics with real‑time trajectory graphs, benchmark charts, broadcast‑mastered voiceover narration, and an upbeat 116 BPM tech‑pop soundtrack with dynamic side‑chain ducking.*
+> ▶️ Click the thumbnail above to watch on Google Drive *(1080p Full HD · 4m 20s)*  
+> *Neobrutalist motion graphics · real-time trajectory graphs · broadcast voiceover · 116 BPM tech-pop soundtrack*
 
 ### 📋 Video Chapter Index
 
