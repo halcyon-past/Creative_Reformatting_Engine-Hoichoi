@@ -1,10 +1,10 @@
 project     = "hoichoi-cre"
 environment = "dev"
-region      = "ap-south-1"
+region      = "us-east-1"
 
 # Build and push both images first (see docs/AWS_MIGRATION.md):
-image     = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/hoichoi-cre:v1"
-web_image = "123456789012.dkr.ecr.ap-south-1.amazonaws.com/hoichoi-cre-web:v1"
+image     = "123456789012.dkr.ecr.us-east-1.amazonaws.com/hoichoi-cre:v1"
+web_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/hoichoi-cre-web:v1"
 
 # Lock the UI down before putting real content in.
 allowed_web_cidrs = ["203.0.113.0/24"]

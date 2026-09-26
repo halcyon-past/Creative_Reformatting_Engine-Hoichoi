@@ -12,7 +12,7 @@ variable "environment" {
 
 variable "region" {
   type    = string
-  default = "ap-south-1"
+  default = "us-east-1"
 }
 
 variable "vpc_cidr" {
@@ -22,7 +22,7 @@ variable "vpc_cidr" {
 
 variable "availability_zones" {
   type    = list(string)
-  default = ["ap-south-1a", "ap-south-1b"]
+  default = ["us-east-1a", "us-east-1b"]
 }
 
 variable "image" {

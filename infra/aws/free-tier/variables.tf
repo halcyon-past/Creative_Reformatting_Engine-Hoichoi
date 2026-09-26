@@ -11,7 +11,7 @@ variable "environment" {
 variable "region" {
   description = "Free Tier applies per account, not per region; pick one near your users."
   type        = string
-  default     = "ap-south-1"
+  default     = "us-east-1"
 }
 
 variable "image" {
@@ -26,14 +26,20 @@ variable "web_image" {
 
 variable "instance_type" {
   description = <<-EOT
-    t3.micro is the Free Tier instance (750h/month for 12 months). It has 1GB
-    of RAM, which is genuinely tight for 1080p video plus the vision models --
-    swap is provisioned to compensate, but renders are slow. t3.small doubles
-    the memory and is the first thing to change once evaluation is over; it is
-    not free.
+    The Free Tier covers 750h/month of **t2.micro** in regions where t2.micro
+    exists -- which includes us-east-1 -- and t3.micro only in regions where it
+    does not. So in us-east-1 the free instance is t2.micro, and setting
+    t3.micro here would quietly fall outside the allowance.
+
+    t2.micro is 1 vCPU / 1GB. That is slow for CPU-bound rendering: expect
+    several minutes for a 30s reel, and the 1GB is tight enough that swap is
+    provisioned to stop the OOM killer taking the worker.
+
+    First upgrade once evaluation is over is t3.small (2 vCPU / 2GB, ~$15/mo,
+    not free). Nothing else in the stack changes.
   EOT
   type    = string
-  default = "t3.micro"
+  default = "t2.micro"
 }
 
 variable "root_volume_gb" {

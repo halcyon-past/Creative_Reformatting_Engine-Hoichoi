@@ -7,7 +7,7 @@
 #
 #   scalable stack            free-tier stack           why
 #   --------------------------------------------------------------------------
-#   ECS Fargate               EC2 t3.micro              Fargate has no free tier;
+#   ECS Fargate               EC2 t2.micro              Fargate has no free tier;
 #                                                       EC2 micro gives 750h/mo
 #   Aurora Serverless v2      SQLite on EBS             Aurora has no free tier
 #   NAT Gateway               public subnet             NAT is ~$32/mo, never free
@@ -19,7 +19,7 @@
 #
 # Free Tier reality check, because "free" has edges:
 #   * EC2 750h/month and EBS 30GB are **12 months from account creation**, not
-#     perpetual. After that a t3.micro is roughly $7-8/month.
+#     perpetual. After that a t2.micro is roughly $8-9/month.
 #   * S3 5GB, 20k GET, 2k PUT are also 12-month. Masters are large: a handful
 #     of 280MB videos will exceed 5GB. The lifecycle rule below expires masters
 #     to keep that in check -- tune it before you rely on it.
@@ -28,11 +28,15 @@
 #   * CloudWatch Logs 5GB ingest/month is always free.
 #   * Data transfer out is 100GB/month free.
 #
-# The honest constraint: **t3.micro has 1GB of RAM**, and decoding 1080p video
-# alongside the MediaPipe models is tight. The user-data below provisions 2GB
-# of swap and pins worker concurrency to 1, which makes it work, but renders
-# will be slow. For anything beyond evaluation use t3.small (not free tier) by
-# setting `instance_type` -- nothing else changes.
+# The honest constraint: **t2.micro is 1 vCPU and 1GB of RAM**, and decoding
+# 1080p video alongside the MediaPipe models is tight on both. The user-data
+# below provisions 2GB of swap and pins worker concurrency to 1, which makes it
+# work rather than crash, but a 30s reel takes several minutes. For anything
+# beyond evaluation use t3.small (not free tier) by setting `instance_type` --
+# nothing else changes.
+#
+# Default region is us-east-1, where the Free Tier EC2 instance is t2.micro
+# (t3.micro is the free instance only in regions without t2).
 #
 # NOTE: terraform was not available in the environment this was authored in, so
 # this configuration has NOT been through `terraform validate` or `plan`.
@@ -61,6 +65,17 @@ locals {
 
 data "aws_availability_zones" "available" {
   state = "available"
+}
+
+data "aws_caller_identity" "current" {}
+
+locals {
+  # Repository names parsed out of the image URIs, so the pull policy stays
+  # scoped to exactly the two repositories this stack actually uses.
+  ecr_repos = [
+    for uri in [var.image, var.web_image] :
+    split(":", split("/", uri)[1])[0]
+  ]
 }
 
 ###############################################################################
@@ -270,6 +285,28 @@ resource "aws_iam_role_policy" "runtime" {
         Effect   = "Allow"
         Action   = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:DescribeLogStreams"]
         Resource = ["${aws_cloudwatch_log_group.app.arn}:*"]
+      },
+      # Pulling the container images at boot. GetAuthorizationToken is an
+      # account-level call and cannot be resource-scoped; the layer reads are
+      # scoped to the two repositories named in var.image / var.web_image.
+      # Without these the instance boots with no containers and the stack looks
+      # deployed while serving nothing.
+      {
+        Effect   = "Allow"
+        Action   = ["ecr:GetAuthorizationToken"]
+        Resource = ["*"]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+        ]
+        Resource = [
+          for name in local.ecr_repos :
+          "arn:aws:ecr:${var.region}:${data.aws_caller_identity.current.account_id}:repository/${name}"
+        ]
       },
     ]
   })
