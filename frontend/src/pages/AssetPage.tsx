@@ -470,7 +470,7 @@ export default function AssetPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="rounded-brutal border border-accent/40 bg-accent px-3 py-1 font-mono text-base font-bold text-accent shadow-brutal-sm">
+              <span className="rounded-brutal border border-accent/40 bg-accent px-3 py-1 font-mono text-base font-bold text-black shadow-brutal-sm">
                 {Math.round((activeJob.progress ?? 0) * 100)}%
               </span>
             </div>
