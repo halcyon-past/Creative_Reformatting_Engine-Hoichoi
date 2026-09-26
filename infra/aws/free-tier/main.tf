@@ -361,6 +361,8 @@ locals {
     chmod +x /usr/local/bin/docker-compose
 
     mkdir -p /opt/cre /data
+    chown -R 10001:10001 /data
+    chmod 777 /data
     cat > /opt/cre/.env <<'ENVEOF'
     CRE_ENV=${var.environment}
     CRE_DEBUG=false

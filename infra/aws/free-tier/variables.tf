@@ -39,7 +39,7 @@ variable "instance_type" {
     not free). Nothing else in the stack changes.
   EOT
   type    = string
-  default = "t2.micro"
+  default = "t3.micro"
 }
 
 variable "root_volume_gb" {
