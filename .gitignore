@@ -6,9 +6,9 @@ diagnostics/
 !data/.gitkeep
 test_sample/*
 !test_sample/.gitkeep
-# demo video: keep ONLY the pitch demo mp4
+# demo video: keep ONLY the thumbnail
 demo_video/*
-!demo_video/creative_reformatting_engine_pitch_demo.mp4
+!demo_video/thumbnail.png
 
 
 # python
