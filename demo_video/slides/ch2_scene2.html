@@ -1,0 +1,154 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  width: 1920px; height: 1080px;
+  background-color: #F8F5EE;
+  background-image: radial-gradient(#111111 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: #111111;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 50px 70px; overflow: hidden;
+  border: 10px solid #111111;
+}
+
+/* Header */
+.top-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 4px solid #111111; padding-bottom: 20px;
+}
+.tag-group { display: flex; align-items: center; gap: 12px; }
+.neo-badge {
+  background: #FFE500; border: 3px solid #111111;
+  box-shadow: 4px 4px 0px #111111;
+  color: #111111; font-weight: 900; font-size: 14px;
+  padding: 6px 14px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.neo-badge-pink { background: #FF3366; color: #FFFFFF; }
+.neo-badge-cyan { background: #00E5FF; color: #111111; }
+.neo-badge-mint { background: #00E575; color: #111111; }
+.neo-badge-violet { background: #C084FC; color: #111111; }
+
+.chapter-pill {
+  background: #111111; color: #FFFFFF;
+  border: 3px solid #111111; box-shadow: 4px 4px 0px #FFE500;
+  font-family: monospace; font-size: 15px; font-weight: 800;
+  padding: 8px 18px; border-radius: 6px;
+}
+
+.title-section { margin-top: 18px; }
+h1 {
+  font-size: 44px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: -1px; color: #111111; display: flex; align-items: center; gap: 16px;
+}
+.subtitle {
+  font-size: 20px; font-weight: 600; color: #4B5563; margin-top: 4px;
+}
+
+/* Common Neobrutalist Cards */
+.neo-card {
+  background: #FFFFFF; border: 3.5px solid #111111;
+  box-shadow: 8px 8px 0px #111111; border-radius: 12px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.neo-card-header {
+  padding: 12px 20px; border-bottom: 3.5px solid #111111;
+  font-weight: 900; font-size: 17px; text-transform: uppercase;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.neo-card-body { padding: 24px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+
+/* Footer */
+.footer-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 4px solid #111111; padding-top: 16px; font-family: monospace; font-size: 14px; font-weight: 700;
+}
+.live-pill {
+  background: #111111; color: #00FFA3; padding: 4px 12px; border-radius: 4px;
+}
+
+      .graph-container { background: #FFFFFF; border: 3.5px solid #111; box-shadow: 8px 8px 0px #111; border-radius: 12px; padding: 24px; margin: 28px 0; flex: 1; display:flex; flex-direction:column; justify-content:space-between; }
+      .chart-svg { width: 100%; height: 260px; }
+    </style></head><body>
+      <div class="top-bar">
+        <div class="tag-group">
+          <span class="neo-badge neo-badge-cyan">ACTIVE SPEAKER DETECTION</span>
+          <span class="neo-badge neo-badge-pink">AUDIO-VISUAL SYNC</span>
+          <span class="neo-badge">MULTI-SPEAKER SOLVER</span>
+        </div>
+        <div class="chapter-pill">CHAPTER 02 · SCENE 2/2</div>
+      </div>
+      <div class="title-section">
+        <h1><span>📊</span> Audio VAD & Visual Lip Motion Synchronization</h1>
+        <p class="subtitle">Correlating speech audio energy with facial lip action dynamics to track active speakers</p>
+      </div>
+
+      <div class="graph-container">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:18px;">
+            <span style="font-family:monospace; font-size:13px; font-weight:800; background:#E0F2FE; border:2px solid #111; padding:4px 10px; border-radius:4px;">
+              🟦 AUDIO SPEECH ENERGY (VAD dB)
+            </span>
+            <span style="font-family:monospace; font-size:13px; font-weight:800; background:#FCE7F3; border:2px solid #111; padding:4px 10px; border-radius:4px;">
+              🟪 SPEAKER 1 LIP DYNAMICS (TRACK #1)
+            </span>
+            <span style="font-family:monospace; font-size:13px; font-weight:800; background:#FEF3C7; border:2px solid #111; padding:4px 10px; border-radius:4px;">
+              🟧 SPEAKER 2 LIP DYNAMICS (TRACK #2)
+            </span>
+          </div>
+          <span style="font-family:monospace; font-size:13px; font-weight:900; background:#00FFA3; border:2px solid #111; padding:4px 10px; border-radius:4px;">
+            SYNC CONFIDENCE: 98.2%
+          </span>
+        </div>
+
+        <!-- SVG Line Graph -->
+        <svg class="chart-svg" viewBox="0 0 1000 240">
+          <!-- Background Grid Lines -->
+          <line x1="50" y1="40" x2="950" y2="40" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="4"/>
+          <line x1="50" y1="100" x2="950" y2="100" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="4"/>
+          <line x1="50" y1="160" x2="950" y2="160" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="4"/>
+          <line x1="50" y1="210" x2="950" y2="210" stroke="#111111" stroke-width="3"/>
+
+          <!-- Highlight Speaker Zones -->
+          <rect x="70" y="30" width="380" height="180" fill="#3B82F6" opacity="0.08"/>
+          <rect x="520" y="30" width="400" height="180" fill="#EC4899" opacity="0.08"/>
+          <text x="180" y="25" font-family="monospace" font-weight="800" font-size="12" fill="#1D4ED8">SPEAKER 1 ACTIVE (SPEECH DOMINANT)</text>
+          <text x="640" y="25" font-family="monospace" font-weight="800" font-size="12" fill="#BE185D">SPEAKER 2 ACTIVE (SPEECH DOMINANT)</text>
+
+          <!-- Audio Waveform (Blue) -->
+          <path d="M 50 140 Q 90 60, 130 110 T 210 50 T 290 120 T 370 70 T 450 180 T 520 80 T 600 40 T 680 130 T 760 60 T 840 100 T 950 170" 
+                fill="none" stroke="#2563EB" stroke-width="3.5"/>
+
+          <!-- Speaker 1 Lip Motion (Purple) -->
+          <path d="M 50 160 Q 90 70, 130 90 T 210 60 T 290 100 T 370 80 T 450 200 T 520 210 T 600 210 T 680 210 T 760 210 T 950 210" 
+                fill="none" stroke="#9333EA" stroke-width="3.5" stroke-dasharray="6 2"/>
+
+          <!-- Speaker 2 Lip Motion (Pink) -->
+          <path d="M 50 210 Q 150 210, 300 210 T 450 200 T 520 90 T 600 50 T 680 110 T 760 70 T 840 90 T 950 180" 
+                fill="none" stroke="#DB2777" stroke-width="3.5"/>
+
+          <!-- Camera Pan Transition Marker -->
+          <line x1="485" y1="20" x2="485" y2="210" stroke="#111" stroke-width="3" stroke-dasharray="3"/>
+          <rect x="445" y="100" width="80" height="24" rx="4" fill="#FFE500" stroke="#111" stroke-width="2"/>
+          <text x="452" y="116" font-family="monospace" font-weight="900" font-size="10" fill="#111">PAN (t=9.2s)</text>
+
+          <!-- Axis Labels -->
+          <text x="50" y="230" font-family="monospace" font-size="12" font-weight="700">t=0s</text>
+          <text x="270" y="230" font-family="monospace" font-size="12" font-weight="700">t=7.5s</text>
+          <text x="480" y="230" font-family="monospace" font-size="12" font-weight="700">t=15.0s (TRANSITION)</text>
+          <text x="700" y="230" font-family="monospace" font-size="12" font-weight="700">t=22.5s</text>
+          <text x="920" y="230" font-family="monospace" font-size="12" font-weight="700">t=30.0s</text>
+        </svg>
+
+        <div style="display:flex; justify-content:space-between; border-top:2px solid #111; padding-top:14px; font-size:13px; font-weight:700;">
+          <span>✓ NO SNAP DISCONTINUITIES</span>
+          <span>✓ MULTI-SPEAKER VAD WEIGHT: 1.00 × SPEECH + 0.45 × FACES + 0.70 × DOMINANCE</span>
+          <span>✓ SMOOTH KINEMATIC CAMERA MOTION</span>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <span>ACTIVE SPEAKER DETECTION · REAL-TIME MULTIMODAL AUDIO-VISUAL FUSION</span>
+        <span class="live-pill">ALGORITHM: VAD + CORRELATION ENGINE</span>
+      </div>
+    </body></html>

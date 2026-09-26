@@ -1,0 +1,159 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  width: 1920px; height: 1080px;
+  background-color: #F8F5EE;
+  background-image: radial-gradient(#111111 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: #111111;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 50px 70px; overflow: hidden;
+  border: 10px solid #111111;
+}
+
+/* Header */
+.top-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 4px solid #111111; padding-bottom: 20px;
+}
+.tag-group { display: flex; align-items: center; gap: 12px; }
+.neo-badge {
+  background: #FFE500; border: 3px solid #111111;
+  box-shadow: 4px 4px 0px #111111;
+  color: #111111; font-weight: 900; font-size: 14px;
+  padding: 6px 14px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.neo-badge-pink { background: #FF3366; color: #FFFFFF; }
+.neo-badge-cyan { background: #00E5FF; color: #111111; }
+.neo-badge-mint { background: #00E575; color: #111111; }
+.neo-badge-violet { background: #C084FC; color: #111111; }
+
+.chapter-pill {
+  background: #111111; color: #FFFFFF;
+  border: 3px solid #111111; box-shadow: 4px 4px 0px #FFE500;
+  font-family: monospace; font-size: 15px; font-weight: 800;
+  padding: 8px 18px; border-radius: 6px;
+}
+
+.title-section { margin-top: 18px; }
+h1 {
+  font-size: 44px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: -1px; color: #111111; display: flex; align-items: center; gap: 16px;
+}
+.subtitle {
+  font-size: 20px; font-weight: 600; color: #4B5563; margin-top: 4px;
+}
+
+/* Common Neobrutalist Cards */
+.neo-card {
+  background: #FFFFFF; border: 3.5px solid #111111;
+  box-shadow: 8px 8px 0px #111111; border-radius: 12px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.neo-card-header {
+  padding: 12px 20px; border-bottom: 3.5px solid #111111;
+  font-weight: 900; font-size: 17px; text-transform: uppercase;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.neo-card-body { padding: 24px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+
+/* Footer */
+.footer-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 4px solid #111111; padding-top: 16px; font-family: monospace; font-size: 14px; font-weight: 700;
+}
+.live-pill {
+  background: #111111; color: #00FFA3; padding: 4px 12px; border-radius: 4px;
+}
+
+      .still-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; margin: 30px 0; flex: 1; }
+      .score-chart { width: 100%; height: 210px; }
+    </style></head><body>
+      <div class="top-bar">
+        <div class="tag-group">
+          <span class="neo-badge neo-badge-mint">KEY STILL EXTRACTION</span>
+          <span class="neo-badge neo-badge-cyan">LAPLACIAN SHARPNESS</span>
+          <span class="neo-badge">PEAK CLARITY</span>
+        </div>
+        <div class="chapter-pill">CHAPTER 04 · SCENE 2/2</div>
+      </div>
+      <div class="title-section">
+        <h1><span>📸</span> Peak-Sharpness Key Still Pulled from Video</h1>
+        <p class="subtitle">Autonomous frame selection scanning across candidate frames for maximal sharpness & open eyes</p>
+      </div>
+
+      <div class="still-grid">
+        <div class="neo-card">
+          <div class="neo-card-header" style="background:#FFE500;">
+            <span>LAPLACIAN VARIANCE SCORE PER CANDIDATE FRAME</span>
+            <span>CLARITY SCAN</span>
+          </div>
+          <div class="neo-card-body">
+            <svg class="score-chart" viewBox="0 0 600 200">
+              <line x1="30" y1="170" x2="570" y2="170" stroke="#111" stroke-width="2"/>
+              <!-- Bars of sharpness -->
+              <rect x="50" y="110" width="30" height="60" fill="#94A3B8" stroke="#111" stroke-width="2"/>
+              <text x="52" y="100" font-family="monospace" font-size="10" font-weight="700">84</text>
+              <text x="50" y="186" font-family="monospace" font-size="10">F12</text>
+
+              <rect x="110" y="80" width="30" height="90" fill="#94A3B8" stroke="#111" stroke-width="2"/>
+              <text x="112" y="70" font-family="monospace" font-size="10" font-weight="700">125</text>
+              <text x="110" y="186" font-family="monospace" font-size="10">F28</text>
+
+              <rect x="170" y="130" width="30" height="40" fill="#F87171" stroke="#111" stroke-width="2"/>
+              <text x="165" y="120" font-family="monospace" font-size="10" font-weight="700">BLUR</text>
+              <text x="170" y="186" font-family="monospace" font-size="10">F44</text>
+
+              <!-- Peak Sharpness Frame -->
+              <rect x="230" y="20" width="40" height="150" fill="#00FFA3" stroke="#111" stroke-width="3"/>
+              <text x="230" y="14" font-family="monospace" font-size="12" font-weight="900" fill="#059669">PEAK: 348</text>
+              <text x="235" y="186" font-family="monospace" font-size="11" font-weight="800">F68 ★</text>
+
+              <rect x="300" y="70" width="30" height="100" fill="#94A3B8" stroke="#111" stroke-width="2"/>
+              <text x="302" y="60" font-family="monospace" font-size="10" font-weight="700">142</text>
+              <text x="300" y="186" font-family="monospace" font-size="10">F88</text>
+
+              <rect x="360" y="90" width="30" height="80" fill="#94A3B8" stroke="#111" stroke-width="2"/>
+              <text x="362" y="80" font-family="monospace" font-size="10" font-weight="700">118</text>
+              <text x="360" y="186" font-family="monospace" font-size="10">F104</text>
+
+              <rect x="420" y="60" width="30" height="110" fill="#94A3B8" stroke="#111" stroke-width="2"/>
+              <text x="422" y="50" font-family="monospace" font-size="10" font-weight="700">160</text>
+              <text x="420" y="186" font-family="monospace" font-size="10">F120</text>
+
+              <rect x="480" y="100" width="30" height="70" fill="#94A3B8" stroke="#111" stroke-width="2"/>
+              <text x="482" y="90" font-family="monospace" font-size="10" font-weight="700">95</text>
+              <text x="480" y="186" font-family="monospace" font-size="10">F140</text>
+            </svg>
+            <div style="background:#FEF3C7; border:2px solid #111; padding:8px 12px; border-radius:6px; font-size:12px; font-weight:700;">
+              FRAME #68 SELECTED AT t=2.26s · ZERO MOTION BLUR · EYE ASPECT RATIO OPEN
+            </div>
+          </div>
+        </div>
+
+        <div class="neo-card">
+          <div class="neo-card-header" style="background:#00E5FF;">
+            <span>KEY STILL DELIVERABLE</span>
+            <span>16:9 1080p</span>
+          </div>
+          <div class="neo-card-body">
+            <div style="background:#E0F2FE; border:3px solid #111; height:150px; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <span style="font-size:36px;">🖼️</span>
+              <span style="font-weight:900; font-size:16px; margin-top:6px;">PRODUCED KEY STILL</span>
+              <span style="font-family:monospace; font-size:12px;">video_still_16x9 · 1920×1080</span>
+            </div>
+            <div style="margin-top:14px; font-size:13px; font-weight:700; color:#374151;">
+              <p>✓ Subject-aware composition around hero actors</p>
+              <p>✓ Automated color balance & JPEG quality 92</p>
+              <p>✓ Independent compliance pass before publish</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <span>CLEAN EXTRACTION: ZERO MOTION ARTIFACTS · BROADCAST THUMBNAIL READY</span>
+        <span class="live-pill">PASS VERDICT: 100%</span>
+      </div>
+    </body></html>
