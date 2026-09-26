@@ -231,11 +231,17 @@ class ReformatService:
         analysis: ImageAnalysis,
         variant: Variant | None = None,
     ) -> Variant:
-        variant = variant or Variant(
-            asset_id=asset.id, profile_id=profile.id,
-            ratio_label=profile.ratio, kind=MediaKind.IMAGE,
-        )
-        variant.status = VariantStatus.RENDERING
+        if variant is not None:
+            variant.status = VariantStatus.RENDERING
+            variant.error = None
+            variant.report = None
+            variant.reframe_path = None
+        else:
+            variant = Variant(
+                asset_id=asset.id, profile_id=profile.id,
+                ratio_label=profile.ratio, kind=MediaKind.IMAGE,
+            )
+            variant.status = VariantStatus.RENDERING
         key = self.variant_key(asset.id, profile, "jpg")
         variant.storage_key = key
         dest = self.storage.reserve_local(key)
@@ -255,10 +261,11 @@ class ReformatService:
         variant: Variant | None = None,
     ) -> Variant:
         """A still pulled from video is just an image variant with extra notes."""
-        variant = variant or Variant(
-            asset_id=asset.id, profile_id=profile.id,
-            ratio_label=profile.ratio, kind=MediaKind.IMAGE,
-        )
+        if variant is None:
+            variant = Variant(
+                asset_id=asset.id, profile_id=profile.id,
+                ratio_label=profile.ratio, kind=MediaKind.IMAGE,
+            )
         rendered = self.render_image_variant(asset, profile, still_analysis, variant)
         if rendered.crop_decision:
             rendered.crop_decision.strategy = "video_still_subject_aware"
@@ -274,11 +281,17 @@ class ReformatService:
         variant: Variant | None = None,
         progress: ProgressFn = _noop,
     ) -> Variant:
-        variant = variant or Variant(
-            asset_id=asset.id, profile_id=profile.id,
-            ratio_label=profile.ratio, kind=MediaKind.VIDEO,
-        )
-        variant.status = VariantStatus.RENDERING
+        if variant is not None:
+            variant.status = VariantStatus.RENDERING
+            variant.error = None
+            variant.report = None
+            variant.reframe_path = None
+        else:
+            variant = Variant(
+                asset_id=asset.id, profile_id=profile.id,
+                ratio_label=profile.ratio, kind=MediaKind.VIDEO,
+            )
+            variant.status = VariantStatus.RENDERING
         key = self.variant_key(asset.id, profile, "mp4")
         variant.storage_key = key
         dest = self.storage.reserve_local(key)
@@ -297,9 +310,18 @@ class ReformatService:
     # ------------------------------------------------------------------ #
     # whole-asset and single-variant flows
     # ------------------------------------------------------------------ #
-    def reformat_all(self, asset: Asset, progress: ProgressFn = _noop) -> list[Variant]:
-        """Produce the full render set for an asset."""
-        profiles = self.spec.render_set(asset.kind)
+    def reformat_all(
+        self,
+        asset: Asset,
+        progress: ProgressFn = _noop,
+        profile_ids: list[str] | None = None,
+        existing_variants: dict[str, Variant] | None = None,
+    ) -> list[Variant]:
+        """Produce the requested render set for an asset."""
+        if profile_ids:
+            profiles = [self.spec.profile(pid) for pid in profile_ids]
+        else:
+            profiles = self.spec.render_set(asset.kind)
         if not profiles:
             raise PipelineError(f"no render set defined for {asset.kind.value}")
 
@@ -311,7 +333,8 @@ class ReformatService:
             analysis = analyze_image(source, self.settings)
             for i, profile in enumerate(profiles):
                 progress(0.1 + 0.85 * i / len(profiles), f"rendering {profile.label}")
-                variants.append(self.render_image_variant(asset, profile, analysis))
+                existing = (existing_variants or {}).get(profile.id)
+                variants.append(self.render_image_variant(asset, profile, analysis, existing))
             progress(1.0, "done")
             return variants
 
@@ -324,9 +347,10 @@ class ReformatService:
 
         still_analysis: ImageAnalysis | None = None
         for profile in profiles:
+            existing = (existing_variants or {}).get(profile.id)
             if profile.is_video:
                 variants.append(
-                    self.render_reel_variant(asset, profile, analysis, progress=progress)
+                    self.render_reel_variant(asset, profile, analysis, existing, progress=progress)
                 )
             else:
                 progress(0.88, "extracting still")
@@ -334,7 +358,7 @@ class ReformatService:
                     still_analysis, _ = still_extractor.extract_still(
                         source, analysis, self.settings
                     )
-                variants.append(self.render_video_still(asset, profile, still_analysis))
+                variants.append(self.render_video_still(asset, profile, still_analysis, existing))
         progress(1.0, "done")
         return variants
 

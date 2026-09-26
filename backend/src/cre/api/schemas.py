@@ -174,3 +174,7 @@ class UploadResponse(BaseModel):
 
 class RegenerateRequest(BaseModel):
     profile_id: str
+
+
+class ReformatRequest(BaseModel):
+    profile_ids: list[str] | None = None

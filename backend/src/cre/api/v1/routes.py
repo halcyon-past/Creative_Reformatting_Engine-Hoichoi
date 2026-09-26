@@ -21,6 +21,7 @@ from cre.api.schemas import (
     JobOut,
     ProfileOut,
     RegenerateRequest,
+    ReformatRequest,
     SpecOut,
     UploadResponse,
     VariantOut,
@@ -131,20 +132,28 @@ async def upload_asset(
     file: Annotated[UploadFile, File(description="Master image or video")],
     title: Annotated[str | None, Form()] = None,
     auto_reformat: Annotated[bool, Form()] = True,
+    profile_ids: Annotated[str | None, Form(description="JSON list or comma-separated profile IDs")] = None,
 ) -> UploadResponse:
-    """Ingest a master asset and, by default, queue the full render set.
-
-    The caller's address is recorded against the upload. See
-    ``cre.api.request_context`` for how it is derived behind a proxy.
-    """
+    """Ingest a master asset and optionally queue selected profiles or full render set."""
     actor = actor_of(request, container)
     asset = await container.assets.ingest_stream(
         file.file, file.filename or "upload", title=title, actor=actor
     )
     job = None
     if auto_reformat:
+        pids: list[str] | None = None
+        if profile_ids:
+            import json
+
+            try:
+                parsed = json.loads(profile_ids)
+                if isinstance(parsed, list):
+                    pids = [str(x) for x in parsed if str(x).strip()]
+            except Exception:
+                pids = [x.strip() for x in profile_ids.split(",") if x.strip()]
+        payload = {"profile_ids": pids} if pids else {}
         job = await container.assets.submit_job(
-            asset.id, JobType.REFORMAT_ALL, actor=actor
+            asset.id, JobType.REFORMAT_ALL, payload, actor=actor
         )
     return UploadResponse(
         asset=await _asset_out(container, asset),
@@ -174,10 +183,16 @@ async def delete_asset(request: Request, container: Ctr, asset_id: str) -> None:
 
 
 @router.post("/assets/{asset_id}/reformat", response_model=JobOut, status_code=202, tags=["assets"])
-async def reformat_asset(request: Request, container: Ctr, asset_id: str) -> JobOut:
-    """Queue a full re-render of every profile in this asset's render set."""
+async def reformat_asset(
+    request: Request,
+    container: Ctr,
+    asset_id: str,
+    body: ReformatRequest | None = None,
+) -> JobOut:
+    """Queue a re-render of specified profiles (or every profile in this asset's render set)."""
+    payload = {"profile_ids": body.profile_ids} if (body and body.profile_ids) else {}
     job = await container.assets.submit_job(
-        asset_id, JobType.REFORMAT_ALL, actor=actor_of(request, container)
+        asset_id, JobType.REFORMAT_ALL, payload, actor=actor_of(request, container)
     )
     return JobOut.build(job)
 

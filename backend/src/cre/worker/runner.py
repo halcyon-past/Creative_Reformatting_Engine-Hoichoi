@@ -204,7 +204,12 @@ class Worker:
             asset.status = AssetStatus.ANALYZING
             self._bridge.call(self.repo.save_asset(asset))
 
-            variants = self.reformat.reformat_all(asset, progress)
+            profile_ids = job.payload.get("profile_ids") if job.payload else None
+            existing_list = self._bridge.call(self.repo.list_variants(asset.id))
+            existing_map = {v.profile_id: v for v in existing_list}
+            variants = self.reformat.reformat_all(
+                asset, progress, profile_ids=profile_ids, existing_variants=existing_map
+            )
             for variant in variants:
                 self._bridge.call(self.repo.save_variant(variant))
 

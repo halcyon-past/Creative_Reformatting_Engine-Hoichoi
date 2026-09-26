@@ -36,18 +36,30 @@ export const api = {
   getAsset: (id: string) => request<Asset>(`/assets/${id}`),
   deleteAsset: (id: string) => request<void>(`/assets/${id}`, { method: "DELETE" }),
 
-  upload: (file: File, title?: string) => {
+  upload: (
+    file: File,
+    title?: string,
+    profileIds?: string[],
+    autoReformat: boolean = true,
+  ) => {
     const form = new FormData();
     form.append("file", file);
     if (title) form.append("title", title);
-    form.append("auto_reformat", "true");
+    form.append("auto_reformat", autoReformat ? "true" : "false");
+    if (profileIds && profileIds.length > 0) {
+      form.append("profile_ids", JSON.stringify(profileIds));
+    }
     return request<{ asset: Asset; job: Job | null }>("/assets", {
       method: "POST",
       body: form,
     });
   },
 
-  reformat: (id: string) => request<Job>(`/assets/${id}/reformat`, { method: "POST" }),
+  reformat: (id: string, profileIds?: string[]) =>
+    request<Job>(`/assets/${id}/reformat`, {
+      method: "POST",
+      body: profileIds && profileIds.length > 0 ? JSON.stringify({ profile_ids: profileIds }) : undefined,
+    }),
 
   regenerate: (id: string, profileId: string) =>
     request<Job>(`/assets/${id}/variants/regenerate`, {

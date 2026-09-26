@@ -106,7 +106,9 @@ jobs:
 
           echo "Starting frontend container..."
           docker run -d --restart always --name cre-web \
-            -p 80:80 --link cre-api:api \
+            -p 80:80 -p 443:443 \
+            -v /etc/letsencrypt:/etc/letsencrypt:ro \
+            --link cre-api:api \
             --log-driver awslogs \
             --log-opt awslogs-region=$AWS_REGION \
             --log-opt awslogs-group=/cre/hoichoi-cre-dev \
@@ -155,7 +157,7 @@ jobs:
           echo "Verifying application health..."
           HEALTHY=false
           for i in {1..15}; do
-            if curl -s -f "http://100.28.92.125/health"; then
+            if curl -s -f -L -k "http://100.28.92.125/health"; then
               echo ""
               echo "=== Application containers verified healthy on EC2! ==="
               HEALTHY=true

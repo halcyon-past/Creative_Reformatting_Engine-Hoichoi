@@ -8,5 +8,8 @@ RUN npm run build
 
 FROM nginx:1.27-alpine
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx-ssl.conf /etc/nginx/conf.d/nginx-ssl.conf
+COPY frontend/entrypoint.sh /docker-entrypoint.d/40-ssl-check.sh
+RUN chmod +x /docker-entrypoint.d/40-ssl-check.sh
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 80 443
