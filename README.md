@@ -1,5 +1,8 @@
 # Creative Reformatting Engine
 
+> **Live Production URL**: [https://cre-hoichoi.aritro.cloud](https://cre-hoichoi.aritro.cloud)  
+> **Pitch Demo Video**: [`demo_video/creative_reformatting_engine_pitch_demo.mp4`](demo_video/creative_reformatting_engine_pitch_demo.mp4) (4m 16s with voiceover narration & ambient soundtrack)
+
 A media pipeline that takes one master image or video and produces every
 platform-ready ratio — **16:9, 1:1, 9:16, 4:5** — with subject-aware smart crop,
 a clean still pulled from video, and a subject-tracked, active-speaker-aware

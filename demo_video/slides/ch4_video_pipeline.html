@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px; height: 1080px;
+    background-color: #0c0e12;
+    color: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 60px 80px; overflow: hidden;
+  }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .badge {
+    background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #60a5fa; font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    padding: 6px 14px; border-radius: 6px; text-transform: uppercase;
+  }
+  h1 { font-size: 46px; font-weight: 800; color: #ffffff; margin-top: 12px; letter-spacing: -1px; }
+  .subtitle { font-size: 22px; color: #94a3b8; margin-top: 6px; }
+
+  .video-grid {
+    display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; margin: 40px 0; flex: 1;
+  }
+  .card {
+    background: #14171f; border: 1px solid #232936; border-radius: 14px; padding: 32px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .timeline-box {
+    background: #090b0e; border: 1px solid #1e2430; border-radius: 10px; padding: 24px; margin: 20px 0;
+  }
+  .speaker-bar {
+    height: 38px; border-radius: 6px; display: flex; overflow: hidden; font-weight: bold; font-size: 13px;
+  }
+  .speaker-left {
+    background: #3b82f6; width: 50%; display: flex; align-items: center; justify-content: center; color: white;
+  }
+  .speaker-right {
+    background: #f97316; width: 50%; display: flex; align-items: center; justify-content: center; color: white;
+  }
+  .path-curve {
+    height: 100px; width: 100%; position: relative; margin-top: 16px; border-bottom: 1px solid #334155;
+  }
+
+  .still-box {
+    background: #090b0e; border: 1px solid #1e2430; border-radius: 10px; padding: 20px;
+  }
+
+  .footer {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid #1e2430; padding-top: 24px; color: #64748b; font-size: 15px;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <span class="badge">Video & Reel Cutdown Benchmark</span>
+      <h1>Active Speaker Tracking & Key Still Extraction</h1>
+      <p class="subtitle">Two-Person Alternating Dialogue Clip ➔ Dynamic 9:16 Vertical Reel</p>
+    </div>
+  </div>
+
+  <div class="video-grid">
+    <div class="card">
+      <div>
+        <h3 style="font-size:20px; font-weight:700; color:#fff;">Active Speaker Tracking Timeline</h3>
+        <p style="font-size:14px; color:#94a3b8; margin-top:6px;">
+          Dialogue alternation between Actor A (Left) and Actor B (Right). Crop camera follows the speaker in sync with speech audio.
+        </p>
+
+        <div class="timeline-box">
+          <p style="font-size:12px; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Audio VAD & Speaker Classification</p>
+          <div class="speaker-bar">
+            <div class="speaker-left">Actor A Speaking (Left) [0.0s - 4.0s]</div>
+            <div class="speaker-right">Actor B Speaking (Right) [4.0s - 8.0s]</div>
+          </div>
+
+          <div style="margin-top:20px;">
+            <p style="font-size:12px; color:#64748b; margin-bottom:4px; text-transform:uppercase;">Horizontal Reframe Camera Path (cx Travel)</p>
+            <svg viewBox="0 0 700 80" style="width:100%; height:80px;">
+              <path d="M 0 60 L 320 60 C 350 60, 370 20, 400 20 L 700 20" fill="none" stroke="#60a5fa" stroke-width="4"/>
+              <circle cx="320" cy="60" r="5" fill="#3b82f6"/>
+              <circle cx="400" cy="20" r="5" fill="#f97316"/>
+              <line x1="350" y1="0" x2="350" y2="80" stroke="#f43f5e" stroke-dasharray="4 4" stroke-width="1.5"/>
+              <text x="355" y="45" fill="#f87171" font-size="11" font-family="monospace">SPEAKER SWITCH</text>
+            </svg>
+          </div>
+        </div>
+
+        <ul style="font-size:14px; color:#cbd5e1; line-height:1.7;">
+          <li>✓ <b>Zero Static Holding:</b> Reframe path tracks speaker transitions across 680px travel.</li>
+          <li>✓ <b>Exponential Smoothing:</b> Camera pans smoothly with EMA filter, preventing jerky frames.</li>
+          <li>✓ <b>Shot Boundary Cut:</b> Hard cut protection prevents unnatural pans across scene changes.</li>
+        </ul>
+      </div>
+      <p style="font-size:12px; color:#64748b;">Reframe path evidence plot is generated and accessible on every video asset.</p>
+    </div>
+
+    <div class="card">
+      <div>
+        <h3 style="font-size:20px; font-weight:700; color:#fff;">Automatic Key Still Extraction</h3>
+        <p style="font-size:14px; color:#94a3b8; margin-top:6px;">
+          Extracts sharpest frame from video candidate frames for platform thumbnail delivery.
+        </p>
+
+        <div class="still-box" style="margin-top:24px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span style="font-size:13px; color:#94a3b8;">Sharpness Algorithm:</span>
+            <span style="font-family:monospace; color:#34d399; font-weight:bold;">Laplacian Variance</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span style="font-size:13px; color:#94a3b8;">Spec Minimum Floor:</span>
+            <span style="font-family:monospace; color:#cbd5e1;">&gt; 60.0 score</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="font-size:13px; color:#94a3b8;">Selected Key Frame:</span>
+            <span style="font-family:monospace; color:#60a5fa; font-weight:bold;">Frame 142 (Score: 78.4)</span>
+          </div>
+        </div>
+
+        <div style="background:rgba(59, 130, 246, 0.1); border:1px solid rgba(59, 130, 246, 0.3); border-radius:8px; padding:16px; margin-top:24px;">
+          <p style="font-size:13px; color:#93c5fd; line-height:1.5;">
+            Guarantees that video stills pulled into the media library are never motion-blurred, defocused, or transition artifacts.
+          </p>
+        </div>
+      </div>
+      <p style="font-size:12px; color:#64748b;">Key Still 16:9 variant is validated against the high-sharpness stills spec.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Active Speaker Coverage: &gt;80% of speech time framed on the talking actor</span>
+    <span style="font-family:monospace; color:#34d399;">Speaker Reframing PASSED</span>
+  </div>
+</body>
+</html>

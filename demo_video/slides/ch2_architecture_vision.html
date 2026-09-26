@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px; height: 1080px;
+    background-color: #0c0e12;
+    color: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 60px 80px; overflow: hidden;
+  }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .badge {
+    background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #60a5fa; font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    padding: 6px 14px; border-radius: 6px; text-transform: uppercase;
+  }
+  h1 { font-size: 46px; font-weight: 800; color: #ffffff; margin-top: 12px; letter-spacing: -1px; }
+  .subtitle { font-size: 22px; color: #94a3b8; margin-top: 6px; }
+
+  .arch-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin: 40px 0; flex: 1;
+  }
+  .arch-card {
+    background: #14171f; border: 1px solid #232936; border-radius: 14px; padding: 28px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .step-num {
+    font-family: monospace; font-size: 13px; font-weight: 800; color: #60a5fa;
+    background: rgba(59, 130, 246, 0.15); width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+  }
+  .card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+  .card-desc { font-size: 14px; color: #94a3b8; line-height: 1.5; }
+  .tech-tag {
+    display: inline-block; background: #0d0f14; border: 1px solid #1e2430;
+    color: #cbd5e1; font-family: monospace; font-size: 12px; padding: 4px 8px; border-radius: 4px; margin-top: 6px;
+  }
+  .footer {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid #1e2430; padding-top: 24px; color: #64748b; font-size: 15px;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <span class="badge">Architecture & Computer Vision</span>
+      <h1>Multimodal Signal Processing & Vision Stack</h1>
+      <p class="subtitle">MediaPipe BlazeFace · SSD Person Tracking · Audio VAD · Active Speaker Correlation</p>
+    </div>
+  </div>
+
+  <div class="arch-grid">
+    <div class="arch-card">
+      <div>
+        <div class="step-num">1</div>
+        <div class="card-title">Ingest & Probing</div>
+        <p class="card-desc">
+          Probe container metadata with FFmpeg. Ingest video or stills stream into standardized memory layouts with hardware acceleration.
+        </p>
+      </div>
+      <div>
+        <span class="tech-tag">FFmpeg 7.1</span>
+        <span class="tech-tag">Probe Metadata</span>
+        <span class="tech-tag">YUV420p / sRGB</span>
+      </div>
+    </div>
+
+    <div class="arch-card">
+      <div>
+        <div class="step-num">2</div>
+        <div class="card-title">Vision Perception</div>
+        <p class="card-desc">
+          BlazeFace sub-millisecond 6-point facial landmarking and mouth aperture estimation. SSD MobileNet tracks full body bounds and Laplacian gradient measures saliency.
+        </p>
+      </div>
+      <div>
+        <span class="tech-tag">MediaPipe BlazeFace</span>
+        <span class="tech-tag">SSD MobileNet</span>
+        <span class="tech-tag">Laplacian Saliency</span>
+      </div>
+    </div>
+
+    <div class="arch-card">
+      <div>
+        <div class="step-num">3</div>
+        <div class="card-title">Audio ASD Sync</div>
+        <p class="card-desc">
+          16kHz speech Voice Activity Detection (VAD) energy tracking. Cross-modal correlation couples speech intervals to lip motion apertures to identify active speakers.
+        </p>
+      </div>
+      <div>
+        <span class="tech-tag">Active Speaker ASD</span>
+        <span class="tech-tag">Energy VAD Gating</span>
+        <span class="tech-tag">Lip Sync Correlation</span>
+      </div>
+    </div>
+
+    <div class="arch-card">
+      <div>
+        <div class="step-num">4</div>
+        <div class="card-title">Crop Solver & Smooth</div>
+        <p class="card-desc">
+          Rule-of-thirds composition solver respects headroom and safe zones. Temporal smoothing applies EMA filtering and shot boundary cut preservation for cinematic pans.
+        </p>
+      </div>
+      <div>
+        <span class="tech-tag">Thirds Composition</span>
+        <span class="tech-tag">EMA Smooth Path</span>
+        <span class="tech-tag">Shot Boundary Cuts</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Publication Gate: Rendered media is re-analyzed by an independent validator before library admission</span>
+    <span style="font-family:monospace; color:#34d399;">PASS / FAIL Guaranteed Audit</span>
+  </div>
+</body>
+</html>

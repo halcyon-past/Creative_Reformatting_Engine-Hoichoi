@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px; height: 1080px;
+    background-color: #0c0e12;
+    color: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 60px 80px; overflow: hidden;
+  }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .badge {
+    background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #60a5fa; font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    padding: 6px 14px; border-radius: 6px; text-transform: uppercase;
+  }
+  .hoichoi-tag {
+    background: #e11d48; color: #fff; font-size: 13px; font-weight: 800;
+    padding: 4px 10px; border-radius: 4px; letter-spacing: 1px;
+  }
+  h1 { font-size: 48px; font-weight: 800; color: #ffffff; margin-top: 12px; letter-spacing: -1px; }
+  .subtitle { font-size: 22px; color: #94a3b8; margin-top: 6px; }
+
+  .content-grid {
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; margin: 40px 0; flex: 1;
+  }
+  .card {
+    background: #14171f; border: 1px solid #232936; border-radius: 14px; padding: 32px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .card-title { font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  
+  .flow-box {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #0d0f14; border: 1px solid #1e2430; border-radius: 10px; padding: 18px 24px; margin-bottom: 16px;
+  }
+  .ratio-pill {
+    background: #1e2433; border: 1px solid #334155; color: #cbd5e1;
+    font-family: monospace; font-size: 15px; font-weight: 700; padding: 8px 14px; border-radius: 6px;
+  }
+  
+  .disqualifier-item {
+    display: flex; align-items: flex-start; gap: 14px; padding: 14px;
+    background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.25);
+    border-radius: 8px; margin-bottom: 14px;
+  }
+  .disq-icon { color: #f43f5e; font-size: 18px; font-weight: bold; }
+  .disq-text { font-size: 15px; color: #fca5a5; line-height: 1.4; }
+  .disq-title { font-weight: 700; color: #ffffff; }
+
+  .footer {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid #1e2430; padding-top: 24px; color: #64748b; font-size: 15px;
+  }
+  .live-url { color: #60a5fa; font-family: monospace; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span class="badge">Problem 4 · Hackathon Pitch</span>
+        <span class="hoichoi-tag">HOICHOI OTT</span>
+      </div>
+      <h1>Creative Reformatting Engine</h1>
+      <p class="subtitle">Automated, subject-aware media reformatting & active-speaker video reframing</p>
+    </div>
+    <div style="text-align:right;">
+      <p style="font-size:15px; color:#64748b;">Track</p>
+      <p style="font-size:18px; font-weight:700; color:#cbd5e1;">Media Pipeline / Computer Vision</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="card">
+      <div>
+        <div class="card-title">
+          <span>🎬</span> Multi-Platform Fragmented Delivery Contract
+        </div>
+        <div class="flow-box">
+          <div>
+            <p style="font-size:12px; color:#64748b; text-transform:uppercase;">Master Source</p>
+            <p style="font-size:18px; font-weight:700; color:#fff;">Single Master Asset</p>
+            <p style="font-size:13px; color:#94a3b8; font-family:monospace;">16:9 1080p / 4K UHD</p>
+          </div>
+          <span style="font-size:24px; color:#60a5fa;">➔</span>
+          <div>
+            <p style="font-size:12px; color:#64748b; text-transform:uppercase;">Engine</p>
+            <p style="font-size:18px; font-weight:700; color:#60a5fa;">Smart Reformat</p>
+            <p style="font-size:13px; color:#94a3b8;">Subject & Speaker Sync</p>
+          </div>
+          <span style="font-size:24px; color:#60a5fa;">➔</span>
+          <div>
+            <p style="font-size:12px; color:#64748b; text-transform:uppercase;">Validation</p>
+            <p style="font-size:18px; font-weight:700; color:#34d399;">Spec Gate</p>
+            <p style="font-size:13px; color:#94a3b8;">Machine Audited</p>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
+          <div class="flow-box" style="margin:0;">
+            <div>
+              <span class="ratio-pill">16:9</span>
+              <p style="font-size:13px; font-weight:600; color:#fff; margin-top:8px;">Hero Landscape</p>
+              <p style="font-size:11px; color:#64748b;">1920×1080 · OTT Desktop & TV</p>
+            </div>
+          </div>
+          <div class="flow-box" style="margin:0;">
+            <div>
+              <span class="ratio-pill">1:1</span>
+              <p style="font-size:13px; font-weight:600; color:#fff; margin-top:8px;">Social Square</p>
+              <p style="font-size:11px; color:#64748b;">1080×1080 · Instagram Feed</p>
+            </div>
+          </div>
+          <div class="flow-box" style="margin:0;">
+            <div>
+              <span class="ratio-pill">9:16</span>
+              <p style="font-size:13px; font-weight:600; color:#fff; margin-top:8px;">Story / Vertical</p>
+              <p style="font-size:11px; color:#64748b;">1080×1920 · TikTok & Reels</p>
+            </div>
+          </div>
+          <div class="flow-box" style="margin:0;">
+            <div>
+              <span class="ratio-pill">4:5</span>
+              <p style="font-size:13px; font-weight:600; color:#fff; margin-top:8px;">Feed Portrait</p>
+              <p style="font-size:11px; color:#64748b;">1080×1350 · Social Portrait</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#64748b;">Video Output: 9:16 Active-Speaker Tracked Vertical Reel + 16:9 Peak-Sharpness Key Still.</p>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-title">
+          <span>⛔</span> Hackathon Auto-Disqualifiers (Guaranteed Avoided)
+        </div>
+
+        <div class="disqualifier-item">
+          <div class="disq-icon">✗</div>
+          <div class="disq-text">
+            <span class="disq-title">Center-Crop with Disconnected Face Detection:</span><br>
+            A naive center crop with face detection bolted on that does not actually influence the crop box.
+          </div>
+        </div>
+
+        <div class="disqualifier-item">
+          <div class="disq-icon">✗</div>
+          <div class="disq-text">
+            <span class="disq-title">Static Frame-0 Video Reframing:</span><br>
+            Vertical video reframed once at frame 0 and held completely static for the duration of the clip.
+          </div>
+        </div>
+
+        <div class="disqualifier-item">
+          <div class="disq-icon">✗</div>
+          <div class="disq-text">
+            <span class="disq-title">Dimension-Only Validator:</span><br>
+            A superficial validator that only checks pixel dimensions without checking face clipping or safe zones.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(52, 211, 153, 0.1); border:1px solid rgba(52, 211, 153, 0.3); border-radius:8px; padding:12px 16px;">
+        <p style="font-size:13px; color:#34d399; font-weight:600;">✓ Our Solution: True Subject-Aware Crop + Dynamic Audio-Synced Reframe + Deep Spec Compliance.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Creative Reformatting Engine · Built by Aritro Saha</span>
+    <span class="live-url">https://cre-hoichoi.aritro.cloud</span>
+  </div>
+</body>
+</html>
